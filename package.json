@@ -1,0 +1,12 @@
+{
+  "name": "speedrun-chart-runner",
+  "version": "1.0.0",
+  "description": "Wojak SPEEDRUN - multiplayer chart runner to $1B market cap",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}

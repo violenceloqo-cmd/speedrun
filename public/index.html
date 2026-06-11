@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>$SPEEDRUN — Run to $1B</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M4 28 L11 21 L14 24 L21 13 L19 13 L26 4 L27 14 L25 12 L16 26 L13 23 L6 30 Z' fill='%234ade80'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #2ecc71;
+    --green-bright: #4ade80;
+    --red: #ef4444;
+    --bg: #0b0f14;
+    --panel: rgba(13, 20, 28, 0.85);
+    --text: #e8eef2;
+    --dim: #7d8b99;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; background: var(--bg); }
+  body {
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    color: var(--text);
+    -webkit-user-select: none; user-select: none;
+    touch-action: manipulation;
+  }
+  #game { display: block; width: 100vw; height: 100vh; }
+
+  /* ---------- HUD ---------- */
+  #hud { position: fixed; inset: 0; pointer-events: none; display: none; }
+  #hud.visible { display: block; }
+
+  #mcap-box {
+    position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+    text-align: center;
+  }
+  #mcap-title {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-size: clamp(14px, 2.4vw, 18px);
+    font-weight: 500;
+    color: #ffffff;
+    letter-spacing: 0.02em;
+    margin-bottom: 6px;
+  }
+  #mcap {
+    font-size: clamp(28px, 5vw, 46px); font-weight: 700;
+    color: var(--green-bright);
+    text-shadow: 0 0 18px rgba(74, 222, 128, 0.55);
+    letter-spacing: 1px;
+  }
+  #mcap-label { font-size: 11px; color: var(--dim); letter-spacing: 3px; margin-top: 2px; }
+  .bounty {
+    display: inline-block; margin-top: 8px;
+    background: rgba(255, 209, 102, 0.08);
+    border: 1px solid rgba(255, 209, 102, 0.45);
+    border-radius: 999px;
+    padding: 5px 16px;
+    font-size: 12px; letter-spacing: 1px; color: #ffd166;
+    text-shadow: 0 0 12px rgba(255, 209, 102, 0.4);
+    animation: bounty-pulse 2.2s ease-in-out infinite;
+  }
+  .bounty b { font-weight: 800; }
+  @keyframes bounty-pulse {
+    0%, 100% { box-shadow: 0 0 8px rgba(255, 209, 102, 0.15); }
+    50% { box-shadow: 0 0 22px rgba(255, 209, 102, 0.45); }
+  }
+
+  #timer-box {
+    position: absolute; top: 16px; right: 16px; text-align: right;
+    background: var(--panel); border: 1px solid #1d2935; border-radius: 8px;
+    padding: 8px 12px;
+  }
+  #timer { font-size: 20px; font-weight: 700; color: #ffd166; }
+  #checkpoint-label { font-size: 11px; color: var(--dim); margin-top: 2px; }
+
+  #players-box {
+    position: absolute; top: 16px; left: 16px;
+    background: var(--panel); border: 1px solid #1d2935; border-radius: 8px;
+    padding: 8px 12px; min-width: 170px; max-width: 230px;
+  }
+  #online-count { font-size: 11px; color: var(--dim); letter-spacing: 1px; margin-bottom: 6px; }
+  #online-dot {
+    display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: #475569; margin-right: 5px; vertical-align: 1px;
+  }
+  #online-dot.live { background: var(--green-bright); box-shadow: 0 0 6px var(--green-bright); }
+  .lb-row { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; line-height: 1.7; }
+  .lb-row .lb-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 120px; }
+  .lb-row .lb-mcap { color: var(--dim); }
+  .lb-row.me .lb-name { font-weight: 700; }
+
+  #toasts {
+    position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column-reverse; align-items: center; gap: 6px;
+    width: max-content; max-width: 90vw;
+  }
+  .toast {
+    background: var(--panel); border: 1px solid #243240; border-radius: 999px;
+    padding: 6px 16px; font-size: 13px; white-space: nowrap;
+    animation: toast-in 0.25s ease-out;
+    transition: opacity 0.5s;
+  }
+  .toast.good { border-color: rgba(74, 222, 128, 0.5); color: var(--green-bright); }
+  .toast.bad  { border-color: rgba(239, 68, 68, 0.5);  color: #fda4af; }
+  @keyframes toast-in { from { transform: translateY(12px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+  #hint {
+    position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%);
+    font-size: 12px; color: var(--dim); letter-spacing: 2px;
+    transition: opacity 1s;
+  }
+
+  #contract-box {
+    position: fixed; right: 14px; bottom: 14px; z-index: 12;
+    background: var(--panel); border: 1px solid #1d2935; border-radius: 8px;
+    padding: 8px 12px; max-width: min(420px, calc(100vw - 28px));
+    pointer-events: auto; cursor: pointer;
+    -webkit-user-select: text; user-select: text;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  #contract-box:hover { border-color: var(--green); box-shadow: 0 0 14px rgba(74, 222, 128, 0.2); }
+  #contract-box.copied { border-color: var(--green-bright); }
+  #contract-label {
+    font-size: 10px; color: var(--dim); letter-spacing: 2px; margin-bottom: 4px;
+  }
+  #contract-addr {
+    font-size: 11px; color: var(--green-bright); word-break: break-all; line-height: 1.4;
+  }
+  #contract-copy { font-size: 10px; color: var(--dim); margin-top: 4px; letter-spacing: 1px; }
+
+  /* ---------- Live chat (docked bottom-left, out of the play area) ---------- */
+  #chat {
+    position: fixed; left: 14px; bottom: 14px; z-index: 9;
+    width: 290px; max-width: calc(100vw - 28px);
+    background: var(--panel); border: 1px solid #1d2935; border-radius: 10px;
+    display: none; flex-direction: column; overflow: hidden;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+  }
+  #chat.visible { display: flex; }
+  #chat-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 12px; cursor: default;
+    border-bottom: 1px solid #1d2935;
+  }
+  #chat-title {
+    font-size: 11px; letter-spacing: 2px; color: var(--dim);
+    display: flex; align-items: center; gap: 6px;
+  }
+  #chat-title .dot {
+    width: 7px; height: 7px; border-radius: 50%; background: #475569;
+  }
+  #chat-title .dot.live { background: var(--green-bright); box-shadow: 0 0 6px var(--green-bright); }
+  #chat-toggle {
+    pointer-events: auto; cursor: pointer;
+    background: transparent; border: 1px solid #2a3a4a; border-radius: 6px;
+    color: var(--text); font: inherit; font-size: 11px; letter-spacing: 1px;
+    padding: 4px 10px; transition: border-color 0.1s, color 0.1s;
+  }
+  #chat-toggle:hover { border-color: var(--green); color: var(--green-bright); }
+
+  #chat-body { display: flex; flex-direction: column; }
+  #chat.disabled #chat-body { display: none; }
+  #chat.disabled #chat-title .dot { background: #475569; box-shadow: none; }
+
+  #chat-messages {
+    height: 190px; overflow-y: auto; overflow-x: hidden;
+    padding: 8px 12px; display: flex; flex-direction: column; gap: 5px;
+    font-size: 12px; line-height: 1.45;
+    scrollbar-width: thin; scrollbar-color: #2a3a4a transparent;
+  }
+  #chat-messages::-webkit-scrollbar { width: 7px; }
+  #chat-messages::-webkit-scrollbar-thumb { background: #2a3a4a; border-radius: 4px; }
+  .chat-msg { word-break: break-word; }
+  .chat-msg .who { font-weight: 700; }
+  .chat-msg.me .who::after { content: ' (you)'; color: var(--dim); font-weight: 400; }
+  .chat-msg .txt { color: var(--text); }
+  .chat-sys { color: var(--dim); font-style: italic; font-size: 11px; }
+
+  #chat-nick { font-size: 11px; color: var(--dim); padding: 0 12px 6px; }
+  #chat-nick b { color: var(--text); font-weight: 700; }
+
+  #chat-form { display: flex; gap: 6px; padding: 0 10px 10px; }
+  #chat-input {
+    flex: 1; min-width: 0; pointer-events: auto;
+    background: #0f1722; border: 1px solid #2a3a4a; border-radius: 7px;
+    color: var(--text); font: inherit; font-size: 13px; padding: 8px 10px; outline: none;
+  }
+  #chat-input:focus { border-color: var(--green); }
+  #chat-send {
+    pointer-events: auto; cursor: pointer;
+    background: var(--green); color: #04140a; border: none; border-radius: 7px;
+    font: inherit; font-size: 13px; font-weight: 700; padding: 8px 12px;
+  }
+  #chat-send:hover { box-shadow: 0 0 14px rgba(46, 204, 113, 0.4); }
+
+  @media (max-width: 560px) {
+    #chat { width: calc(100vw - 28px); }
+    #chat-messages { height: 130px; }
+  }
+
+  /* ---------- Overlays ---------- */
+  .overlay {
+    position: fixed; inset: 0; display: none;
+    align-items: center; justify-content: center;
+    background: radial-gradient(ellipse at center, rgba(11,15,20,0.6) 0%, rgba(11,15,20,0.95) 100%);
+    z-index: 10;
+  }
+  .overlay.visible { display: flex; }
+  .panel { text-align: center; padding: 24px; max-width: 480px; width: 100%; }
+
+  .logo {
+    font-size: clamp(38px, 9vw, 64px); font-weight: 800; letter-spacing: 2px;
+    color: var(--green-bright);
+    text-shadow: 0 0 30px rgba(74, 222, 128, 0.5);
+  }
+  .logo .dollar { color: #ffd166; text-shadow: 0 0 30px rgba(255, 209, 102, 0.5); }
+  .tagline { color: var(--dim); margin: 10px 0 30px; font-size: 14px; letter-spacing: 1px; }
+  .tagline b { color: var(--text); }
+
+  #name-input {
+    width: 100%; max-width: 300px;
+    background: #0f1722; border: 1px solid #2a3a4a; border-radius: 8px;
+    color: var(--text); font: inherit; font-size: 17px; text-align: center;
+    padding: 12px; outline: none; margin-bottom: 14px;
+  }
+  #name-input:focus { border-color: var(--green); }
+
+  .btn {
+    display: inline-block; cursor: pointer; pointer-events: auto;
+    background: var(--green); color: #04140a; border: none; border-radius: 8px;
+    font: inherit; font-size: 18px; font-weight: 800; letter-spacing: 2px;
+    padding: 13px 42px;
+    box-shadow: 0 0 24px rgba(46, 204, 113, 0.35);
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 0 34px rgba(46, 204, 113, 0.55); }
+  .btn:active { transform: translateY(0); }
+
+  .controls-hint { margin-top: 26px; font-size: 12px; color: var(--dim); line-height: 2; }
+  kbd {
+    background: #18232e; border: 1px solid #2a3a4a; border-bottom-width: 2px;
+    border-radius: 5px; padding: 2px 8px; font: inherit; font-size: 11px;
+  }
+
+  #win-time { font-size: 40px; font-weight: 800; color: #ffd166; margin: 8px 0 4px; }
+  #win-sub { color: var(--dim); font-size: 13px; margin-bottom: 28px; }
+  .win-title {
+    font-size: clamp(34px, 8vw, 56px); font-weight: 800;
+    color: var(--green-bright); text-shadow: 0 0 40px rgba(74, 222, 128, 0.7);
+  }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<div id="hud">
+  <div id="players-box">
+    <div id="online-count"><span id="online-dot"></span><span id="online-text">offline</span></div>
+    <div id="leaderboard"></div>
+  </div>
+  <div id="mcap-box">
+    <div id="mcap-title">Speedrun To 1 Billion</div>
+    <div id="mcap">$50.0K</div>
+    <div id="mcap-label">MARKET CAP &middot; TARGET $1B</div>
+    <div class="bounty">FIRST TO $1B WINS <b>5 SOL</b></div>
+  </div>
+  <div id="timer-box">
+    <div id="timer">0:00.0</div>
+    <div id="checkpoint-label">no checkpoint</div>
+  </div>
+  <div id="toasts"></div>
+  <div id="hint">SPACE / TAP TO JUMP &middot; DOUBLE JUMP AVAILABLE</div>
+</div>
+
+<div id="contract-box" title="Click to copy contract address">
+  <div id="contract-label">CONTRACT ADDRESS</div>
+  <div id="contract-addr">2XfauA2pBS4kBZo9gttgCTPjbXbd86yr6CEZRH4dpump</div>
+  <div id="contract-copy">click to copy</div>
+</div>
+
+<div id="chat">
+  <div id="chat-header">
+    <span id="chat-title"><span class="dot"></span>LIVE CHAT</span>
+    <button id="chat-toggle" type="button">disable</button>
+  </div>
+  <div id="chat-body">
+    <div id="chat-messages"></div>
+    <div id="chat-nick">chatting as <b id="chat-nick-name">…</b></div>
+    <form id="chat-form" autocomplete="off">
+      <input id="chat-input" maxlength="200" placeholder="say something…" autocomplete="off" spellcheck="false">
+      <button id="chat-send" type="submit">send</button>
+    </form>
+  </div>
+</div>
+
+<div id="title-screen" class="overlay visible">
+  <div class="panel">
+    <div class="logo"><span class="dollar">$</span>SPEEDRUN</div>
+    <div class="tagline">we are here &rarr; <b>$50K</b> &middot;&middot;&middot; run the chart to <b>$1B</b></div>
+    <div class="bounty" style="margin: 0 0 24px;">FIRST TO $1B WINS <b>5 SOL</b></div>
+    <br>
+    <input id="name-input" maxlength="16" placeholder="your name" autocomplete="off" spellcheck="false">
+    <br>
+    <button id="start-btn" class="btn">START RUN</button>
+    <div class="controls-hint">
+      <kbd>SPACE</kbd> / <kbd>TAP</kbd> jump &middot; press again to double jump<br>
+      dodge red candles &middot; clear the rug pulls &middot; duck under FUD
+    </div>
+  </div>
+</div>
+
+<div id="win-screen" class="overlay">
+  <div class="panel">
+    <div class="win-title">$1,000,000,000</div>
+    <div class="tagline">WAGMI. you sent it.</div>
+    <div id="win-time">0:00.0</div>
+    <div id="win-sub">deaths: <span id="win-deaths">0</span></div>
+    <button id="restart-btn" class="btn">RUN IT BACK</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// =====================================================================
+//  $SPEEDRUN — wojak chart runner
+//  World coordinates: x grows right, y grows UP (like a chart).
+// =====================================================================
+
+// ---------- canvas ----------
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+let W = 0, H = 0, DPR = 1;
+function resize() {
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width = W * DPR; canvas.height = H * DPR;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ---------- helpers ----------
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const lerp = (a, b, t) => a + (b - a) * t;
+
+// Deterministic RNG — fixed seed shared by every client so all players
+// run the exact same chart and ghost positions line up 1:1.
+function mulberry32(seed) {
+  return function () {
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const WORLD_SEED = 0x5BEED;
+
+// ---------- market cap model ----------
+const M0 = 50e3, M_WIN = 1e9, X_WIN = 60000;
+const K = Math.log(M_WIN / M0) / X_WIN;
+const mcapAt = (x) => Math.min(M_WIN, M0 * Math.exp(K * Math.max(0, x)));
+const xForMcap = (m) => Math.log(m / M0) / K;
+
+function fmtMcap(m) {
+  if (m >= 1e9) return '$' + (m / 1e9).toFixed(2).replace(/\.?0+$/, '') + 'B';
+  if (m >= 1e6) return '$' + (m / 1e6).toFixed(m >= 1e8 ? 0 : 1) + 'M';
+  return '$' + (m / 1e3).toFixed(1) + 'K';
+}
+function fmtTime(s) {
+  const m = Math.floor(s / 60);
+  return m + ':' + (s - m * 60).toFixed(1).padStart(4, '0');
+}
+
+const CHECKPOINTS = [1e6, 1e7, 1e8, 5e8].map((m) => ({ m, x: xForMcap(m), label: fmtMcap(m) }));
+
+// ---------- terrain ----------
+// Ground is a list of "pieces" (polylines). Gaps between pieces = rug pulls.
+const terrain = {
+  pieces: [[{ x: -700, y: 0 }, { x: 0, y: 0 }]],
+  gaps: [],        // rug pulls: {x0, x1, y} — fall below y while inside = death
+  obstacles: [],   // {type, x, y, w, h}  (x,y = bottom-left in world)
+  genX: 0,
+  rng: mulberry32(WORLD_SEED),
+};
+
+function nearCheckpoint(x0, x1) {
+  for (const cp of CHECKPOINTS) {
+    if (x1 > cp.x - 360 && x0 < cp.x + 360) return true;
+  }
+  return x1 > X_WIN - 700; // keep the finish clean
+}
+
+function maybeObstacle(x0, x1, y0, y1, diff) {
+  if (x1 < 1000 || nearCheckpoint(x0, x1)) return;
+  const rng = terrain.rng;
+  if (rng() > 0.32 + 0.5 * diff) return;
+  const t = 0.35 + rng() * 0.3;
+  const ox = lerp(x0, x1, t);
+  const oy = lerp(y0, y1, t);
+  const roll = rng();
+  if (roll < 0.34) {
+    // red candle: jump over it
+    const w = 26 + rng() * 22;
+    const h = 55 + rng() * (55 + 60 * diff);
+    terrain.obstacles.push({ type: 'candle', x: ox - w / 2, y: oy, w, h: Math.min(h, 150), wick: 18 + rng() * 26 });
+  } else if (roll < 0.52) {
+    // cactus: ground obstacle, jump over
+    const w = 38 + rng() * 14, h = 58 + rng() * 22;
+    terrain.obstacles.push({ type: 'cactus', x: ox - w / 2, y: oy, w, h });
+  } else if (roll < 0.66 && diff > 0.08) {
+    // whale dump: big and wide, needs a well-timed (double) jump
+    const w = 110 + rng() * 40, h = 62 + rng() * 16;
+    terrain.obstacles.push({ type: 'whale', x: ox - w / 2, y: oy, w, h });
+  } else if (roll < 0.84) {
+    // FUD cloud: floats at jump height — stay grounded to pass under
+    const w = 78 + rng() * 40, h = 40;
+    terrain.obstacles.push({ type: 'cloud', x: ox - w / 2, y: oy + 96, w, h, puff: rng() });
+  } else {
+    // paper hands: floating low — stay grounded to pass under
+    const w = 64 + rng() * 24, h = 44;
+    terrain.obstacles.push({ type: 'paper', x: ox - w / 2, y: oy + 90, w, h });
+  }
+}
+
+function addChunk() {
+  const rng = terrain.rng;
+  const pieces = terrain.pieces;
+  let piece = pieces[pieces.length - 1];
+  const last = piece[piece.length - 1];
+  const diff = clamp(last.x / X_WIN, 0, 1);
+  const r = rng();
+
+  if (r < 0.42) {
+    // flat-ish run (obstacle territory)
+    const dx = 250 + rng() * 240;
+    const p = { x: last.x + dx, y: last.y + (rng() * 36 - 12) };
+    piece.push(p);
+    maybeObstacle(last.x, p.x, last.y, p.y, diff);
+  } else if (r < 0.58 && diff > 0.04 && !nearCheckpoint(last.x, last.x + 500)) {
+    // rug pull: run-up, then a gap to jump across
+    const runup = 130 + rng() * 110;
+    const x1 = last.x + runup;
+    piece.push({ x: x1, y: last.y });
+    maybeObstacle(last.x, x1, last.y, last.y, diff * 0.4);
+    const gapW = 105 + rng() * (60 + 110 * diff);
+    terrain.gaps.push({ x0: x1, x1: x1 + gapW, y: last.y });
+    pieces.push([{ x: x1 + gapW, y: last.y + (rng() < 0.5 ? 0 : 30 + rng() * 50) }]);
+  } else if (r < 0.88) {
+    // pump: steep climb up
+    const dx = 95 + rng() * 95;
+    const dy = 100 + rng() * 170;
+    piece.push({ x: last.x + dx, y: last.y + dy });
+  } else {
+    // small dip (chart pullback)
+    const dx = 60 + rng() * 60;
+    const dy = -(40 + rng() * 75);
+    piece.push({ x: last.x + dx, y: last.y + dy });
+  }
+
+  const lp = pieces[pieces.length - 1];
+  terrain.genX = lp[lp.length - 1].x;
+}
+
+function genTo(x) {
+  while (terrain.genX < x) addChunk();
+}
+
+// Ground height at world x, or null if over a gap.
+function groundYAt(x) {
+  const pieces = terrain.pieces;
+  for (let i = 0; i < pieces.length; i++) {
+    const piece = pieces[i];
+    if (x < piece[0].x || x > piece[piece.length - 1].x) continue;
+    for (let j = 1; j < piece.length; j++) {
+      if (x <= piece[j].x) {
+        const a = piece[j - 1], b = piece[j];
+        const t = b.x === a.x ? 1 : (x - a.x) / (b.x - a.x);
+        return lerp(a.y, b.y, t);
+      }
+    }
+  }
+  return null;
+}
+
+// Nearest solid ground at-or-after x (used for spawns and flags).
+function solidGroundAfter(x) {
+  genTo(x + 1200);
+  for (let probe = x; probe < x + 1200; probe += 8) {
+    const gy = groundYAt(probe);
+    if (gy !== null) return { x: probe, y: gy };
+  }
+  return { x, y: 0 };
+}
+
+function gapAt(x) {
+  genTo(x + 50);
+  for (const gap of terrain.gaps) {
+    if (x >= gap.x0 && x <= gap.x1) return gap;
+  }
+  return null;
+}
+
+// ---------- player ----------
+const GRAVITY = 2300;
+const JUMP_V = 800, DJUMP_V = 700;
+const PLAYER_W = 26, PLAYER_H = 64;
+
+const player = {
+  x: 0, y: 0, vy: 0,
+  grounded: true, jumpsLeft: 2,
+  lastGroundY: 0,
+  state: 'idle', // idle | run | dead | won
+  deadTimer: 0,
+  deaths: 0,
+  checkpointIdx: -1, // index into CHECKPOINTS, -1 = start
+  runTime: 0,
+  phase: 0, // run-cycle phase
+};
+
+function speedAt(x) { return 290 + 250 * clamp(x / X_WIN, 0, 1); }
+
+function startRun() {
+  player.x = 0; player.y = 0; player.vy = 0;
+  player.grounded = true; player.jumpsLeft = 2;
+  player.lastGroundY = 0;
+  player.state = 'run';
+  player.deaths = 0;
+  player.checkpointIdx = -1;
+  player.runTime = 0;
+  cam.x = player.x - W * 0.32;
+  cam.y = player.y - H * 0.45;
+  confetti.length = 0;
+}
+
+function respawn() {
+  const cpx = player.checkpointIdx >= 0 ? CHECKPOINTS[player.checkpointIdx].x : 0;
+  const spot = solidGroundAfter(cpx);
+  player.x = spot.x; player.y = spot.y; player.vy = 0;
+  player.grounded = true; player.jumpsLeft = 2;
+  player.lastGroundY = spot.y;
+  player.state = 'run';
+}
+
+function jump() {
+  if (player.state !== 'run') return;
+  if (player.grounded || player.jumpsLeft === 2) {
+    player.vy = JUMP_V;
+    player.grounded = false;
+    player.jumpsLeft = 1;
+    sfx.jump();
+  } else if (player.jumpsLeft === 1) {
+    player.vy = DJUMP_V;
+    player.jumpsLeft = 0;
+    sfx.doubleJump();
+  }
+}
+
+function die(reason) {
+  if (player.state !== 'run') return;
+  player.state = 'dead';
+  player.deadTimer = 0.95;
+  player.deaths++;
+  spawnDeathParticles(player.x, player.y + 32);
+  sfx.death();
+  net.sendEvent('death', fmtMcap(mcapAt(player.x)));
+  toast(reason + ' — back to ' + (player.checkpointIdx >= 0 ? CHECKPOINTS[player.checkpointIdx].label : 'the start'), 'bad');
+}
+
+function winRun() {
+  player.state = 'won';
+  sfx.win();
+  net.sendEvent('win', fmtTime(player.runTime));
+  spawnConfetti();
+  document.getElementById('win-time').textContent = fmtTime(player.runTime);
+  document.getElementById('win-deaths').textContent = player.deaths;
+  setTimeout(() => document.getElementById('win-screen').classList.add('visible'), 1100);
+}
+
+function playerBox() {
+  return { x: player.x - PLAYER_W / 2, y: player.y, w: PLAYER_W, h: PLAYER_H };
+}
+
+function updatePlayer(dt) {
+  if (player.state === 'dead') {
+    player.deadTimer -= dt;
+    if (player.deadTimer <= 0) respawn();
+    return;
+  }
+  if (player.state !== 'run') return;
+
+  player.runTime += dt;
+  const sp = speedAt(player.x);
+  player.x += sp * dt;
+  player.phase += sp * dt * 0.045;
+
+  genTo(player.x + W * 1.5);
+
+  const gy = groundYAt(player.x);
+
+  if (player.grounded) {
+    if (gy === null) {
+      // ran off into a rug pull
+      player.grounded = false;
+      player.vy = 0;
+    } else {
+      player.y = gy;
+      player.lastGroundY = gy;
+      player.jumpsLeft = 2;
+    }
+  }
+  if (!player.grounded) {
+    player.vy -= GRAVITY * dt;
+    player.y += player.vy * dt;
+    const gap = gapAt(player.x);
+    // only land when there is solid ground — never snap onto the far ledge mid-fall through a gap
+    if (gy !== null && !gap && player.vy <= 0 && player.y <= gy) {
+      player.y = gy;
+      player.vy = 0;
+      player.grounded = true;
+      player.lastGroundY = gy;
+      player.jumpsLeft = 2;
+    }
+  }
+
+  // fell into a rug pull — die as soon as you drop below the chart line inside a gap
+  const activeGap = gapAt(player.x);
+  if (!player.grounded && activeGap && player.y < activeGap.y - 50) {
+    die('rugged');
+    return;
+  }
+  if (!player.grounded && player.y < player.lastGroundY - 160) {
+    die('rugged');
+    return;
+  }
+
+  // checkpoints
+  const nextIdx = player.checkpointIdx + 1;
+  if (nextIdx < CHECKPOINTS.length && player.x >= CHECKPOINTS[nextIdx].x) {
+    player.checkpointIdx = nextIdx;
+    sfx.checkpoint();
+    toast('CHECKPOINT — ' + CHECKPOINTS[nextIdx].label + ' market cap', 'good');
+  }
+
+  // win
+  if (player.x >= X_WIN) { winRun(); return; }
+
+  // obstacle collisions (obstacles are generated in ascending x order)
+  const pb = playerBox();
+  for (const o of terrain.obstacles) {
+    if (o.x > player.x + 200) break;
+    if (o.x + o.w < player.x - 200) continue;
+    if (pb.x < o.x + o.w && pb.x + pb.w > o.x && pb.y < o.y + o.h && pb.y + pb.h > o.y) {
+      die({ candle: 'red candle', cactus: 'impaled on a cactus', whale: 'whale dumped on you', cloud: 'hit FUD', paper: 'paper handed' }[o.type] || 'rekt');
+      return;
+    }
+  }
+}
+
+// ---------- camera ----------
+const cam = { x: 0, y: 0 };
+function updateCamera(dt) {
+  const tx = player.x - W * 0.32;
+  const ty = (player.grounded ? player.y : player.lastGroundY) - H * 0.45;
+  cam.x = lerp(cam.x, tx, 1 - Math.exp(-8 * dt));
+  cam.y = lerp(cam.y, ty, 1 - Math.exp(-3.2 * dt));
+}
+const sx = (wx) => wx - cam.x;
+const sy = (wy) => H - (wy - cam.y);
+
+// ---------- particles ----------
+const particles = [];
+function spawnDeathParticles(x, y) {
+  for (let i = 0; i < 26; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const v = 120 + Math.random() * 330;
+    particles.push({
+      x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v + 150,
+      life: 0.6 + Math.random() * 0.5,
+      color: Math.random() < 0.5 ? '#ef4444' : '#fda4af',
+      r: 2 + Math.random() * 3,
+    });
+  }
+}
+const confetti = [];
+function spawnConfetti() {
+  const colors = ['#4ade80', '#ffd166', '#4dd2ff', '#ff79c6', '#a78bfa'];
+  for (let i = 0; i < 140; i++) {
+    confetti.push({
+      x: Math.random() * W, y: -20 - Math.random() * H,
+      vx: (Math.random() - 0.5) * 60, vy: -(120 + Math.random() * 160),
+      rot: Math.random() * Math.PI, vrot: (Math.random() - 0.5) * 8,
+      color: colors[(Math.random() * colors.length) | 0],
+      w: 5 + Math.random() * 6,
+    });
+  }
+}
+function updateParticles(dt) {
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.life -= dt;
+    if (p.life <= 0) { particles.splice(i, 1); continue; }
+    p.vy -= 900 * dt;
+    p.x += p.vx * dt; p.y += p.vy * dt;
+  }
+  for (let i = confetti.length - 1; i >= 0; i--) {
+    const c = confetti[i];
+    c.y -= c.vy * dt; // screen-space: vy negative means falling down
+    c.x += c.vx * dt + Math.sin(c.rot * 3) * 0.6;
+    c.rot += c.vrot * dt;
+    if (c.y > H + 30) confetti.splice(i, 1);
+  }
+}
+
+// ---------- wojak drawing ----------
+// Stickman body + procedurally drawn wojak head, side profile facing right.
+// (x, y) = feet position in SCREEN coordinates.
+function drawWojak(c, x, y, phase, opts) {
+  const o = opts || {};
+  const col = o.color || '#e8eef2';
+  const alpha = o.alpha != null ? o.alpha : 1;
+  const dead = !!o.dead;
+  const airborne = !!o.airborne;
+
+  c.save();
+  c.globalAlpha = alpha;
+  c.lineWidth = 3;
+  c.lineCap = 'round';
+  c.lineJoin = 'round';
+  c.strokeStyle = col;
+
+  const hipY = y - 30, neckY = y - 56, shY = y - 50;
+  const headCX = x + 2, headCY = y - 70;
+
+  // legs
+  c.beginPath();
+  if (dead) {
+    c.moveTo(x, hipY); c.lineTo(x - 16, y - 6);
+    c.moveTo(x, hipY); c.lineTo(x + 14, y - 4);
+  } else if (airborne) {
+    c.moveTo(x, hipY); c.lineTo(x + 10, hipY + 12); c.lineTo(x + 18, hipY + 2);
+    c.moveTo(x, hipY); c.lineTo(x - 6, hipY + 14); c.lineTo(x + 4, hipY + 20);
+  } else {
+    const s1 = Math.sin(phase), s2 = Math.sin(phase + Math.PI);
+    c.moveTo(x, hipY);
+    c.lineTo(x + s1 * 9, hipY + 16);
+    c.lineTo(x + s1 * 15 + 3, y - Math.max(0, -s1) * 8);
+    c.moveTo(x, hipY);
+    c.lineTo(x + s2 * 9, hipY + 16);
+    c.lineTo(x + s2 * 15 + 3, y - Math.max(0, -s2) * 8);
+  }
+  c.stroke();
+
+  // torso
+  c.beginPath();
+  c.moveTo(x, hipY); c.lineTo(x + 1, neckY);
+  c.stroke();
+
+  // arms
+  c.beginPath();
+  if (dead) {
+    c.moveTo(x, shY); c.lineTo(x - 14, shY + 16);
+    c.moveTo(x, shY); c.lineTo(x + 12, shY + 18);
+  } else if (airborne) {
+    c.moveTo(x, shY); c.lineTo(x + 12, shY - 8); c.lineTo(x + 20, shY - 16);
+    c.moveTo(x, shY); c.lineTo(x - 8, shY - 6); c.lineTo(x - 14, shY - 14);
+  } else {
+    const a1 = Math.sin(phase + Math.PI), a2 = Math.sin(phase);
+    c.moveTo(x, shY); c.lineTo(x + a1 * 8, shY + 9); c.lineTo(x + a1 * 13 + 5, shY + 14);
+    c.moveTo(x, shY); c.lineTo(x + a2 * 8, shY + 9); c.lineTo(x + a2 * 13 + 5, shY + 14);
+  }
+  c.stroke();
+
+  // ---- wojak head (side profile, facing right) ----
+  c.fillStyle = dead ? '#ffccd5' : '#f1f1ee';
+  c.beginPath();
+  // bald dome + face profile with nose bump and chin
+  c.moveTo(headCX - 11, headCY + 6);
+  c.bezierCurveTo(headCX - 14, headCY - 8, headCX - 6, headCY - 16, headCX + 2, headCY - 16);
+  c.bezierCurveTo(headCX + 10, headCY - 16, headCX + 14, headCY - 9, headCX + 13, headCY - 2); // forehead
+  c.lineTo(headCX + 12, headCY + 1);
+  c.quadraticCurveTo(headCX + 17, headCY + 4, headCX + 12, headCY + 6); // nose
+  c.quadraticCurveTo(headCX + 13, headCY + 11, headCX + 8, headCY + 13); // mouth area / chin
+  c.quadraticCurveTo(headCX - 2, headCY + 16, headCX - 8, headCY + 12); // jaw
+  c.closePath();
+  c.fill();
+  c.lineWidth = 2;
+  c.strokeStyle = '#22272e';
+  c.stroke();
+
+  // face details
+  c.strokeStyle = '#22272e';
+  c.fillStyle = '#22272e';
+  c.lineWidth = 1.6;
+  if (dead) {
+    // X eye + tears
+    c.beginPath();
+    c.moveTo(headCX + 3, headCY - 4); c.lineTo(headCX + 9, headCY + 1);
+    c.moveTo(headCX + 9, headCY - 4); c.lineTo(headCX + 3, headCY + 1);
+    c.stroke();
+    c.fillStyle = '#4dd2ff';
+    c.beginPath(); c.arc(headCX + 5, headCY + 6, 1.7, 0, 7); c.fill();
+    c.beginPath(); c.arc(headCX + 7, headCY + 10, 1.4, 0, 7); c.fill();
+  } else {
+    // resigned wojak eye + brow
+    c.beginPath(); c.moveTo(headCX + 2, headCY - 5); c.lineTo(headCX + 9, headCY - 4); c.stroke(); // brow
+    c.beginPath(); c.ellipse(headCX + 6, headCY - 1.5, 2.6, 1.6, 0, 0, 7); c.stroke();
+    c.beginPath(); c.arc(headCX + 6.6, headCY - 1.5, 0.9, 0, 7); c.fill(); // pupil
+    c.beginPath(); c.moveTo(headCX + 5, headCY + 8); c.quadraticCurveTo(headCX + 8, headCY + 7, headCX + 10, headCY + 8.5); c.stroke(); // flat mouth
+    c.beginPath(); c.arc(headCX - 5, headCY + 2, 2.6, -1.2, 1.4); c.stroke(); // ear
+  }
+
+  // name tag
+  if (o.name) {
+    c.globalAlpha = Math.min(1, alpha + 0.25);
+    c.font = '700 11px ui-monospace, Menlo, monospace';
+    c.textAlign = 'center';
+    c.fillStyle = col;
+    c.fillText(o.name, x, y - 96);
+  }
+  c.restore();
+}
+
+// ---------- rendering ----------
+function drawBackground() {
+  ctx.fillStyle = '#0b0f14';
+  ctx.fillRect(0, 0, W, H);
+
+  // watermark
+  ctx.save();
+  ctx.globalAlpha = 0.035;
+  ctx.font = '800 ' + Math.min(140, W * 0.13) + 'px ui-monospace, Menlo, monospace';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#4ade80';
+  ctx.fillText('$SPEEDRUN', W / 2, H * 0.5);
+  ctx.restore();
+
+  // grid (world-locked)
+  const grid = 260;
+  ctx.strokeStyle = 'rgba(125, 139, 153, 0.08)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  for (let gx = Math.floor(cam.x / grid) * grid; gx < cam.x + W + grid; gx += grid) {
+    ctx.moveTo(sx(gx), 0); ctx.lineTo(sx(gx), H);
+  }
+  for (let gy = Math.floor(cam.y / grid) * grid; gy < cam.y + H + grid; gy += grid) {
+    ctx.moveTo(0, sy(gy)); ctx.lineTo(W, sy(gy));
+  }
+  ctx.stroke();
+
+  // faint price-axis labels on the left (decorative, scales with height)
+  ctx.save();
+  ctx.font = '10px ui-monospace, Menlo, monospace';
+  ctx.fillStyle = 'rgba(125, 139, 153, 0.30)';
+  ctx.textAlign = 'left';
+  for (let gy = Math.floor(cam.y / grid) * grid; gy < cam.y + H + grid; gy += grid) {
+    if (gy < 0) continue;
+    ctx.fillText(fmtMcap(mcapAt(gy * (X_WIN / 14000))), 8, sy(gy) - 4);
+  }
+  ctx.restore();
+}
+
+function drawTerrain() {
+  const xMin = cam.x - 100, xMax = cam.x + W + 100;
+  genTo(xMax);
+
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  for (const piece of terrain.pieces) {
+    if (piece[piece.length - 1].x < xMin || piece[0].x > xMax) continue;
+
+    // fill under the line
+    ctx.beginPath();
+    ctx.moveTo(sx(piece[0].x), sy(piece[0].y));
+    for (let i = 1; i < piece.length; i++) ctx.lineTo(sx(piece[i].x), sy(piece[i].y));
+    ctx.lineTo(sx(piece[piece.length - 1].x), H + 40);
+    ctx.lineTo(sx(piece[0].x), H + 40);
+    ctx.closePath();
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, 'rgba(46, 204, 113, 0.16)');
+    grad.addColorStop(1, 'rgba(46, 204, 113, 0.0)');
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // glowing chart line
+    ctx.beginPath();
+    ctx.moveTo(sx(piece[0].x), sy(piece[0].y));
+    for (let i = 1; i < piece.length; i++) ctx.lineTo(sx(piece[i].x), sy(piece[i].y));
+    ctx.shadowColor = '#2ecc71';
+    ctx.shadowBlur = 14;
+    ctx.strokeStyle = '#34d97b';
+    ctx.lineWidth = 5;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
+  ctx.restore();
+}
+
+function drawObstacles() {
+  const xMin = cam.x - 200, xMax = cam.x + W + 200;
+  for (const o of terrain.obstacles) {
+    if (o.x + o.w < xMin || o.x > xMax) continue;
+
+    if (o.type === 'candle') {
+      const x0 = sx(o.x), yBot = sy(o.y), yTop = sy(o.y + o.h);
+      // wick
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(x0 + o.w / 2, yTop);
+      ctx.lineTo(x0 + o.w / 2, sy(o.y + o.h + o.wick));
+      ctx.stroke();
+      // body
+      ctx.save();
+      ctx.shadowColor = '#ef4444';
+      ctx.shadowBlur = 10;
+      ctx.fillStyle = '#dc2626';
+      ctx.fillRect(x0, yTop, o.w, yBot - yTop);
+      ctx.restore();
+      ctx.strokeStyle = '#7f1d1d';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(x0, yTop, o.w, yBot - yTop);
+    } else if (o.type === 'cactus') {
+      // desert cactus — jump over
+      const bx = sx(o.x), by = sy(o.y);
+      const w = o.w, h = o.h;
+      const cx = bx + w / 2;
+      ctx.save();
+      ctx.fillStyle = '#16a34a';
+      ctx.strokeStyle = '#14532d';
+      ctx.lineWidth = 1.5;
+      // main trunk
+      const tw = w * 0.34;
+      ctx.fillRect(cx - tw / 2, by - h, tw, h);
+      ctx.strokeRect(cx - tw / 2, by - h, tw, h);
+      // left arm
+      const armH = h * 0.38, armW = w * 0.28;
+      ctx.fillRect(cx - tw / 2 - armW, by - h * 0.72, armW, armH);
+      ctx.strokeRect(cx - tw / 2 - armW, by - h * 0.72, armW, armH);
+      ctx.fillRect(cx - tw / 2 - armW, by - h * 0.72 - armW * 0.9, armW * 0.55, armW * 0.9);
+      ctx.strokeRect(cx - tw / 2 - armW, by - h * 0.72 - armW * 0.9, armW * 0.55, armW * 0.9);
+      // right arm
+      ctx.fillRect(cx + tw / 2, by - h * 0.55, armW, armH * 0.85);
+      ctx.strokeRect(cx + tw / 2, by - h * 0.55, armW, armH * 0.85);
+      ctx.fillRect(cx + tw / 2 + armW * 0.45, by - h * 0.55 - armW * 0.8, armW * 0.55, armW * 0.8);
+      ctx.strokeRect(cx + tw / 2 + armW * 0.45, by - h * 0.55 - armW * 0.8, armW * 0.55, armW * 0.8);
+      // spines
+      ctx.strokeStyle = '#86efac';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 6; i++) {
+        const sy2 = by - h * (0.15 + i * 0.13);
+        ctx.beginPath();
+        ctx.moveTo(cx - tw / 2 - 2, sy2); ctx.lineTo(cx - tw / 2 - 8, sy2 - 3);
+        ctx.moveTo(cx + tw / 2 + 2, sy2 + 4); ctx.lineTo(cx + tw / 2 + 8, sy2 + 1);
+        ctx.stroke();
+      }
+      ctx.restore();
+    } else if (o.type === 'whale') {
+      // whale dump: big whale sitting on the chart
+      const bx = sx(o.x), by = sy(o.y);
+      const w = o.w, h = o.h;
+      ctx.save();
+      ctx.shadowColor = '#3b82f6';
+      ctx.shadowBlur = 12;
+      ctx.fillStyle = '#2563eb';
+      // body (facing left)
+      ctx.beginPath();
+      ctx.moveTo(bx + w * 0.02, by - h * 0.45);
+      ctx.quadraticCurveTo(bx + w * 0.05, by - h * 0.95, bx + w * 0.45, by - h * 0.92);
+      ctx.quadraticCurveTo(bx + w * 0.85, by - h * 0.88, bx + w * 0.92, by - h * 0.45);
+      ctx.quadraticCurveTo(bx + w * 0.94, by - h * 0.1, bx + w * 0.6, by);
+      ctx.lineTo(bx + w * 0.1, by);
+      ctx.quadraticCurveTo(bx - w * 0.02, by - h * 0.15, bx + w * 0.02, by - h * 0.45);
+      ctx.closePath();
+      ctx.fill();
+      // tail fluke
+      ctx.beginPath();
+      ctx.moveTo(bx + w * 0.9, by - h * 0.5);
+      ctx.quadraticCurveTo(bx + w * 1.06, by - h * 0.85, bx + w * 1.02, by - h * 0.2);
+      ctx.quadraticCurveTo(bx + w * 0.96, by - h * 0.45, bx + w * 0.9, by - h * 0.32);
+      ctx.closePath();
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      // belly
+      ctx.fillStyle = '#93c5fd';
+      ctx.beginPath();
+      ctx.ellipse(bx + w * 0.4, by - h * 0.12, w * 0.34, h * 0.14, 0, 0, Math.PI);
+      ctx.fill();
+      // eye
+      ctx.fillStyle = '#0b0f14';
+      ctx.beginPath(); ctx.arc(bx + w * 0.14, by - h * 0.5, 2.4, 0, 7); ctx.fill();
+      // spout
+      ctx.strokeStyle = '#7dd3fc'; ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(bx + w * 0.3, by - h * 0.92); ctx.lineTo(bx + w * 0.26, by - h * 1.18);
+      ctx.moveTo(bx + w * 0.3, by - h * 0.92); ctx.lineTo(bx + w * 0.36, by - h * 1.16);
+      ctx.stroke();
+      // SELL tag
+      ctx.fillStyle = '#dbeafe';
+      ctx.font = '700 11px ui-monospace, Menlo, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('SELL', bx + w * 0.45, by - h * 0.38);
+      ctx.restore();
+    } else if (o.type === 'paper') {
+      // paper hands: two trembling paper-white hands floating at head height
+      const cx = sx(o.x + o.w / 2), cy = sy(o.y + o.h / 2);
+      const tremor = Math.sin(performance.now() * 0.02 + o.x) * 2;
+      ctx.save();
+      ctx.fillStyle = '#f3f4f6';
+      ctx.strokeStyle = '#9ca3af';
+      ctx.lineWidth = 1.4;
+      for (const side of [-1, 1]) {
+        const hx = cx + side * o.w * 0.24 + (side > 0 ? tremor : -tremor);
+        const hy = cy + (side > 0 ? 2 : -2);
+        // palm
+        ctx.beginPath();
+        ctx.ellipse(hx, hy + 6, 9, 11, side * 0.2, 0, 7);
+        ctx.fill(); ctx.stroke();
+        // fingers
+        for (let f = -2; f <= 2; f++) {
+          ctx.beginPath();
+          ctx.ellipse(hx + f * 4.2, hy - 8 + Math.abs(f) * 1.6, 2.1, 6.5, f * 0.12, 0, 7);
+          ctx.fill(); ctx.stroke();
+        }
+      }
+      ctx.fillStyle = '#6b7280';
+      ctx.font = '700 9px ui-monospace, Menlo, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('PAPER', cx, cy + o.h / 2 + 12);
+      ctx.restore();
+    } else {
+      // FUD cloud
+      const cx = sx(o.x + o.w / 2), cy = sy(o.y + o.h / 2);
+      ctx.save();
+      ctx.globalAlpha = 0.92;
+      ctx.fillStyle = '#3f4b59';
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, o.w / 2, o.h / 2, 0, 0, 7);
+      ctx.ellipse(cx - o.w * 0.28, cy + 4, o.w * 0.26, o.h * 0.4, 0, 0, 7);
+      ctx.ellipse(cx + o.w * 0.28, cy + 3, o.w * 0.24, o.h * 0.38, 0, 0, 7);
+      ctx.fill();
+      ctx.fillStyle = '#aab7c4';
+      ctx.font = '700 12px ui-monospace, Menlo, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('FUD', cx, cy + 4);
+      ctx.restore();
+    }
+  }
+}
+
+function drawFlags() {
+  for (const cp of CHECKPOINTS) {
+    if (cp.x < cam.x - 200 || cp.x > cam.x + W + 200) continue;
+    const spot = solidGroundAfter(cp.x);
+    const fx = sx(spot.x), fy = sy(spot.y);
+    const reached = player.checkpointIdx >= CHECKPOINTS.indexOf(cp);
+    ctx.save();
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(fx, fy); ctx.lineTo(fx, fy - 88); ctx.stroke();
+    ctx.fillStyle = reached ? '#4ade80' : '#ffd166';
+    ctx.beginPath();
+    ctx.moveTo(fx, fy - 88); ctx.lineTo(fx + 46, fy - 76); ctx.lineTo(fx, fy - 64);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#04140a';
+    ctx.font = '700 10px ui-monospace, Menlo, monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText(cp.label, fx + 4, fy - 73);
+    ctx.restore();
+  }
+
+  // start marker: "we are here ->"
+  if (cam.x < 600) {
+    ctx.save();
+    ctx.fillStyle = '#e8eef2';
+    ctx.font = '700 16px ui-monospace, Menlo, monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText('we are here \u2192', sx(-40), sy(0) + 36);
+    ctx.restore();
+  }
+
+  // finish: "1b ->" + moon
+  if (cam.x + W > X_WIN - 900) {
+    const spot = solidGroundAfter(X_WIN);
+    ctx.save();
+    // moon
+    ctx.beginPath();
+    ctx.shadowColor = '#fef9c3';
+    ctx.shadowBlur = 40;
+    ctx.fillStyle = '#fef3c7';
+    ctx.arc(sx(X_WIN + 320), sy(spot.y + 380), 56, 0, 7);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#e8eef2';
+    ctx.font = '800 30px ui-monospace, Menlo, monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText('1b \u2192', sx(X_WIN - 30), sy(spot.y + 140));
+    // finish line
+    ctx.strokeStyle = '#ffd166';
+    ctx.lineWidth = 4;
+    ctx.setLineDash([10, 8]);
+    ctx.beginPath();
+    ctx.moveTo(sx(X_WIN), sy(spot.y) + 10);
+    ctx.lineTo(sx(X_WIN), sy(spot.y + 300));
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+function drawParticles() {
+  for (const p of particles) {
+    ctx.globalAlpha = clamp(p.life * 2, 0, 1);
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(sx(p.x), sy(p.y), p.r, 0, 7);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  for (const c of confetti) {
+    ctx.save();
+    ctx.translate(c.x, c.y);
+    ctx.rotate(c.rot);
+    ctx.fillStyle = c.color;
+    ctx.fillRect(-c.w / 2, -c.w / 4, c.w, c.w / 2);
+    ctx.restore();
+  }
+}
+
+function drawGhosts() {
+  for (const g of ghosts.values()) {
+    if (g.dx === undefined) continue;
+    if (g.dx < cam.x - 150 || g.dx > cam.x + W + 150) {
+      drawGhostIndicator(g);
+      continue;
+    }
+    drawWojak(ctx, sx(g.dx), sy(g.dy), g.dx * 0.045, {
+      color: g.color, alpha: 0.55, dead: g.dead,
+      airborne: false, name: g.name,
+    });
+  }
+}
+
+// Off-screen ghosts: small arrow at screen edge so you know who's ahead/behind
+function drawGhostIndicator(g) {
+  const ahead = g.dx > cam.x + W;
+  const ex = ahead ? W - 26 : 26;
+  const ey = clamp(sy(g.dy) - 40, 60, H - 60);
+  ctx.save();
+  ctx.globalAlpha = 0.7;
+  ctx.fillStyle = g.color;
+  ctx.beginPath();
+  if (ahead) { ctx.moveTo(ex + 10, ey); ctx.lineTo(ex - 4, ey - 7); ctx.lineTo(ex - 4, ey + 7); }
+  else { ctx.moveTo(ex - 10, ey); ctx.lineTo(ex + 4, ey - 7); ctx.lineTo(ex + 4, ey + 7); }
+  ctx.closePath(); ctx.fill();
+  ctx.font = '700 10px ui-monospace, Menlo, monospace';
+  ctx.textAlign = ahead ? 'right' : 'left';
+  ctx.fillText(g.name, ahead ? ex - 8 : ex + 8, ey + 3);
+  ctx.restore();
+}
+
+function render() {
+  drawBackground();
+  drawTerrain();
+  drawObstacles();
+  drawFlags();
+  drawGhosts();
+  if (player.state !== 'idle') {
+    drawWojak(ctx, sx(player.x), sy(player.y), player.phase, {
+      color: '#e8eef2',
+      dead: player.state === 'dead',
+      airborne: !player.grounded && player.state === 'run',
+    });
+  }
+  drawParticles();
+}
+
+// ---------- sound (WebAudio synth, no assets) ----------
+const sfx = (() => {
+  let ac = null;
+  function ctxAudio() {
+    if (!ac) ac = new (window.AudioContext || window.webkitAudioContext)();
+    if (ac.state === 'suspended') ac.resume();
+    return ac;
+  }
+  function blip(freq, dur, type, vol, slide) {
+    try {
+      const a = ctxAudio();
+      const t = a.currentTime;
+      const osc = a.createOscillator();
+      const g = a.createGain();
+      osc.type = type || 'square';
+      osc.frequency.setValueAtTime(freq, t);
+      if (slide) osc.frequency.exponentialRampToValueAtTime(Math.max(30, freq + slide), t + dur);
+      g.gain.setValueAtTime(vol || 0.08, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      osc.connect(g).connect(a.destination);
+      osc.start(t); osc.stop(t + dur + 0.02);
+    } catch (e) { /* audio unavailable */ }
+  }
+  return {
+    unlock: () => ctxAudio(),
+    jump: () => blip(330, 0.12, 'square', 0.06, 250),
+    doubleJump: () => blip(440, 0.12, 'square', 0.06, 320),
+    death: () => { blip(220, 0.35, 'sawtooth', 0.09, -160); },
+    checkpoint: () => { blip(523, 0.1, 'square', 0.07); setTimeout(() => blip(784, 0.16, 'square', 0.07), 90); },
+    win: () => { [523, 659, 784, 1047, 1319].forEach((f, i) => setTimeout(() => blip(f, 0.22, 'square', 0.08), i * 110)); },
+  };
+})();
+
+// ---------- networking ----------
+const ghosts = new Map(); // id -> {name, color, x, y, dx, dy, mcap, dead, won}
+let myId = null;
+
+const net = (() => {
+  let ws = null;
+  let joined = false;
+  let retry = 1000;
+  let stateTimer = null;
+
+  function setStatus(online) {
+    document.getElementById('online-dot').classList.toggle('live', online);
+  }
+
+  function connect() {
+    if (!playerName) return;
+    const proto = location.protocol === 'https:' ? 'wss://' : 'ws://';
+    try { ws = new WebSocket(proto + location.host); } catch (e) { scheduleRetry(); return; }
+
+    ws.onopen = () => {
+      retry = 1000;
+      ws.send(JSON.stringify({ t: 'join', name: playerName }));
+    };
+    ws.onmessage = (e) => {
+      let msg; try { msg = JSON.parse(e.data); } catch { return; }
+      handle(msg);
+    };
+    ws.onclose = () => {
+      joined = false;
+      setStatus(false);
+      ghosts.clear();
+      scheduleRetry();
+    };
+    ws.onerror = () => { try { ws.close(); } catch (e) {} };
+  }
+
+  function scheduleRetry() {
+    setTimeout(connect, retry);
+    retry = Math.min(retry * 1.6, 10000);
+  }
+
+  function handle(msg) {
+    if (msg.t === 'welcome') {
+      joined = true;
+      myId = msg.id;
+      setStatus(true);
+      chat.setNick(playerName);
+      chat.system('connected — chatting as ' + playerName);
+      ghosts.clear();
+      for (const p of msg.players) addGhost(p);
+    } else if (msg.t === 'chat') {
+      chat.receive(msg);
+    } else if (msg.t === 'join') {
+      addGhost(msg);
+      toast(msg.name + ' joined the run', 'good');
+    } else if (msg.t === 'leave') {
+      ghosts.delete(msg.id);
+    } else if (msg.t === 'state') {
+      const g = ghosts.get(msg.id);
+      if (!g) return;
+      g.x = msg.x; g.y = msg.y; g.mcap = msg.mcap;
+      g.dead = msg.dead; g.won = msg.won;
+      if (g.dx === undefined) { g.dx = g.x; g.dy = g.y; }
+    } else if (msg.t === 'event') {
+      if (msg.kind === 'death') toast(msg.name + ' got rugged at ' + msg.label, 'bad');
+      else if (msg.kind === 'win') toast(msg.name + ' hit $1B in ' + msg.label + '! WAGMI', 'good');
+    }
+  }
+
+  function addGhost(p) {
+    ghosts.set(p.id, {
+      name: p.name, color: p.color,
+      x: p.x || 0, y: p.y || 0, dx: undefined, dy: undefined,
+      mcap: p.mcap || 0, dead: !!p.dead, won: !!p.won,
+    });
+  }
+
+  function startStateLoop() {
+    if (stateTimer) return;
+    stateTimer = setInterval(() => {
+      if (!joined || !ws || ws.readyState !== WebSocket.OPEN) return;
+      ws.send(JSON.stringify({
+        t: 'state',
+        x: Math.round(player.x), y: Math.round(player.y),
+        mcap: Math.round(mcapAt(player.x)),
+        dead: player.state === 'dead',
+        won: player.state === 'won',
+      }));
+    }, 66);
+  }
+
+  function sendEvent(kind, label) {
+    if (!joined || !ws || ws.readyState !== WebSocket.OPEN) return;
+    ws.send(JSON.stringify({ t: 'event', kind, label }));
+  }
+
+  function sendChat(text) {
+    if (!joined || !ws || ws.readyState !== WebSocket.OPEN) return false;
+    ws.send(JSON.stringify({ t: 'chat', text }));
+    return true;
+  }
+
+  return { connect, startStateLoop, sendEvent, sendChat };
+})();
+
+// ---------- live chat ----------
+// Docked in the bottom-left corner so it never overlaps the run.
+// Toggle button enables/disables it; the preference is remembered.
+const chat = (() => {
+  const el = document.getElementById('chat');
+  const messagesEl = document.getElementById('chat-messages');
+  const inputEl = document.getElementById('chat-input');
+  const formEl = document.getElementById('chat-form');
+  const toggleEl = document.getElementById('chat-toggle');
+  const nickEl = document.getElementById('chat-nick-name');
+  const dotEl = document.querySelector('#chat-title .dot');
+
+  let enabled = localStorage.getItem('speedrun-chat') !== 'off';
+
+  function applyEnabled() {
+    el.classList.toggle('disabled', !enabled);
+    toggleEl.textContent = enabled ? 'disable' : 'enable';
+    dotEl.classList.toggle('live', enabled);
+  }
+
+  toggleEl.addEventListener('click', () => {
+    enabled = !enabled;
+    localStorage.setItem('speedrun-chat', enabled ? 'on' : 'off');
+    applyEnabled();
+    if (enabled) inputEl.focus();
+  });
+
+  formEl.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const text = inputEl.value.trim();
+    if (!text) return;
+    if (net.sendChat(text)) inputEl.value = '';
+  });
+
+  // Keep typing local: stop keystrokes from bubbling out to the jump handler.
+  inputEl.addEventListener('keydown', (e) => {
+    e.stopPropagation();
+    if (e.key === 'Escape') inputEl.blur();
+  });
+
+  function addLine(node) {
+    const atBottom = messagesEl.scrollHeight - messagesEl.scrollTop - messagesEl.clientHeight < 30;
+    messagesEl.appendChild(node);
+    while (messagesEl.children.length > 80) messagesEl.removeChild(messagesEl.firstChild);
+    if (atBottom) messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function system(text) {
+    const div = document.createElement('div');
+    div.className = 'chat-sys';
+    div.textContent = text;
+    addLine(div);
+  }
+
+  function receive(msg) {
+    const div = document.createElement('div');
+    div.className = 'chat-msg' + (msg.id === myId ? ' me' : '');
+    const who = document.createElement('span');
+    who.className = 'who';
+    who.style.color = msg.color || '#e8eef2';
+    who.textContent = msg.name;
+    const sep = document.createTextNode(': ');
+    const txt = document.createElement('span');
+    txt.className = 'txt';
+    txt.textContent = msg.text;
+    div.append(who, sep, txt);
+    addLine(div);
+  }
+
+  function setNick(nick) { nickEl.textContent = nick; }
+  function show() { el.classList.add('visible'); applyEnabled(); }
+
+  applyEnabled();
+  return { receive, system, setNick, show };
+})();
+
+function updateGhosts(dt) {
+  const k = Math.min(1, dt * 10);
+  for (const g of ghosts.values()) {
+    if (g.dx === undefined) continue;
+    g.dx += (g.x - g.dx) * k;
+    g.dy += (g.y - g.dy) * k;
+  }
+}
+
+// ---------- HUD ----------
+const elMcap = document.getElementById('mcap');
+const elTimer = document.getElementById('timer');
+const elCpLabel = document.getElementById('checkpoint-label');
+const elLeaderboard = document.getElementById('leaderboard');
+const elOnlineText = document.getElementById('online-text');
+const elHint = document.getElementById('hint');
+
+function toast(text, cls) {
+  const box = document.getElementById('toasts');
+  const div = document.createElement('div');
+  div.className = 'toast' + (cls ? ' ' + cls : '');
+  div.textContent = text;
+  box.appendChild(div);
+  while (box.children.length > 4) box.removeChild(box.firstChild);
+  setTimeout(() => { div.style.opacity = '0'; }, 2600);
+  setTimeout(() => { div.remove(); }, 3200);
+}
+
+let lbTimer = 0;
+function updateHUD(dt) {
+  elMcap.textContent = fmtMcap(mcapAt(player.x));
+  elTimer.textContent = fmtTime(player.runTime);
+  elCpLabel.textContent = player.checkpointIdx >= 0
+    ? 'checkpoint: ' + CHECKPOINTS[player.checkpointIdx].label
+    : 'no checkpoint';
+  if (player.runTime > 8 && elHint.style.opacity !== '0') elHint.style.opacity = '0';
+
+  lbTimer -= dt;
+  if (lbTimer > 0) return;
+  lbTimer = 0.25;
+
+  const entries = [{ name: playerName + ' (you)', mcap: mcapAt(player.x), color: '#e8eef2', me: true, won: player.state === 'won' }];
+  for (const g of ghosts.values()) {
+    entries.push({ name: g.name, mcap: g.mcap, color: g.color, me: false, won: g.won });
+  }
+  entries.sort((a, b) => b.mcap - a.mcap);
+
+  const total = ghosts.size + 1;
+  elOnlineText.textContent = total + ' runner' + (total === 1 ? '' : 's') + ' online';
+
+  let html = '';
+  for (let i = 0; i < Math.min(entries.length, 6); i++) {
+    const e = entries[i];
+    html += '<div class="lb-row' + (e.me ? ' me' : '') + '">'
+      + '<span class="lb-name" style="color:' + e.color + '">' + (i + 1) + '. ' + escapeHtml(e.name) + (e.won ? ' [1B]' : '') + '</span>'
+      + '<span class="lb-mcap">' + fmtMcap(e.mcap) + '</span></div>';
+  }
+  elLeaderboard.innerHTML = html;
+}
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// ---------- input ----------
+let playerName = '';
+
+window.addEventListener('keydown', (e) => {
+  if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
+    const ae = document.activeElement;
+    if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA')) return;
+    e.preventDefault();
+    jump();
+  }
+  if (e.code === 'Enter' && document.getElementById('title-screen').classList.contains('visible')) {
+    beginGame();
+  }
+});
+canvas.addEventListener('pointerdown', (e) => { e.preventDefault(); jump(); });
+
+document.getElementById('start-btn').addEventListener('click', beginGame);
+document.getElementById('restart-btn').addEventListener('click', () => {
+  document.getElementById('win-screen').classList.remove('visible');
+  startRun();
+});
+
+function beginGame() {
+  const input = document.getElementById('name-input');
+  playerName = input.value.trim().slice(0, 16);
+  if (!playerName) {
+    input.focus();
+    return;
+  }
+  localStorage.setItem('speedrun-name', playerName);
+  document.getElementById('title-screen').classList.remove('visible');
+  document.getElementById('hud').classList.add('visible');
+  chat.setNick(playerName);
+  chat.show();
+  sfx.unlock();
+  startRun();
+  net.connect();
+  net.startStateLoop();
+}
+document.getElementById('name-input').value = localStorage.getItem('speedrun-name') || '';
+
+// ---------- contract address (click to copy) ----------
+const CONTRACT_ADDR = '2XfauA2pBS4kBZo9gttgCTPjbXbd86yr6CEZRH4dpump';
+const contractBox = document.getElementById('contract-box');
+const contractCopyEl = document.getElementById('contract-copy');
+let copyTimer = null;
+
+function copyToClipboard(text) {
+  // Textarea fallback first — works on HTTP, Safari, mobile (Clipboard API often blocked).
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.setAttribute('readonly', '');
+  ta.style.cssText = 'position:fixed;top:0;left:0;width:2px;height:2px;padding:0;border:none;outline:none;box-shadow:none;background:transparent';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  ta.setSelectionRange(0, text.length);
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+  document.body.removeChild(ta);
+  if (ok) return Promise.resolve();
+  if (navigator.clipboard && window.isSecureContext) {
+    return navigator.clipboard.writeText(text);
+  }
+  return Promise.reject(new Error('copy failed'));
+}
+
+function showCopied() {
+  contractBox.classList.add('copied');
+  contractCopyEl.textContent = 'copied!';
+  clearTimeout(copyTimer);
+  copyTimer = setTimeout(() => {
+    contractBox.classList.remove('copied');
+    contractCopyEl.textContent = 'click to copy';
+  }, 1600);
+}
+
+contractBox.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+});
+contractBox.addEventListener('click', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  copyToClipboard(CONTRACT_ADDR).then(showCopied).catch(() => {
+    contractCopyEl.textContent = 'copy failed — select address manually';
+  });
+});
+
+// ---------- main loop ----------
+let lastT = performance.now();
+let acc = 0;
+const STEP = 1 / 120;
+
+function frame(now) {
+  let dt = (now - lastT) / 1000;
+  lastT = now;
+  dt = Math.min(dt, 0.1);
+
+  acc += dt;
+  let steps = 0;
+  while (acc >= STEP && steps < 12) {
+    updatePlayer(STEP);
+    acc -= STEP;
+    steps++;
+  }
+  updateCamera(dt);
+  updateGhosts(dt);
+  updateParticles(dt);
+  render();
+  if (document.getElementById('hud').classList.contains('visible')) updateHUD(dt);
+
+  requestAnimationFrame(frame);
+}
+
+genTo(W * 2);
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
