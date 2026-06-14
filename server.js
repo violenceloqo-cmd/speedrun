@@ -40,6 +40,13 @@ const server = http.createServer((req, res) => {
 
 const wss = new WebSocketServer({ server });
 
+// Only accept WebSocket connections from the deployed frontend (and any
+// extra origins listed in ALLOWED_ORIGINS, comma-separated). An empty
+// allowlist disables the check (useful for quick local testing).
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ||
+  'https://worldcuprun.fun,https://www.worldcuprun.fun')
+  .split(',').map((s) => s.trim()).filter(Boolean);
+
 const COLORS = [
   '#4dd2ff', '#ff79c6', '#ffd166', '#a78bfa', '#ff8c42',
   '#2dd4bf', '#f472b6', '#a3e635', '#60a5fa', '#fb7185',
@@ -63,12 +70,18 @@ function rosterFor(exceptId) {
   const list = [];
   for (const [pid, p] of players) {
     if (pid === exceptId) continue;
-    list.push({ id: pid, name: p.name, color: p.color, ...p.state });
+    list.push({ id: pid, name: p.name, color: p.color, country: p.country, ...p.state });
   }
   return list;
 }
 
-wss.on('connection', (ws) => {
+wss.on('connection', (ws, req) => {
+  const origin = req.headers.origin;
+  if (ALLOWED_ORIGINS.length && !ALLOWED_ORIGINS.includes(origin)) {
+    ws.close(1008, 'origin not allowed');
+    return;
+  }
+
   let id = null;
   ws.isAlive = true;
   ws.on('pong', () => { ws.isAlive = true; });
@@ -80,21 +93,22 @@ wss.on('connection', (ws) => {
     if (msg.t === 'join' && id === null) {
       id = nextId++;
       const name = String(msg.name || '').trim().slice(0, 16) || 'anon';
+      const country = String(msg.country || '').trim().slice(0, 4);
       const color = COLORS[id % COLORS.length];
       players.set(id, {
-        ws, name, color,
-        state: { x: 0, y: 0, mcap: 0, dead: false, won: false },
+        ws, name, color, country,
+        state: { x: 0, y: 0, prog: 0, dead: false, won: false },
       });
-      send(ws, { t: 'welcome', id, name, color, players: rosterFor(id) });
-      broadcast({ t: 'join', id, name, color }, id);
-      console.log(`[+] ${name} joined (${players.size} online)`);
+      send(ws, { t: 'welcome', id, name, color, country, players: rosterFor(id) });
+      broadcast({ t: 'join', id, name, color, country }, id);
+      console.log(`[+] ${name} (${country || '—'}) joined (${players.size} online)`);
     } else if (msg.t === 'state' && id !== null) {
       const p = players.get(id);
       if (!p) return;
       p.state = {
         x: +msg.x || 0,
         y: +msg.y || 0,
-        mcap: +msg.mcap || 0,
+        prog: +msg.prog || 0,
         dead: !!msg.dead,
         won: !!msg.won,
       };
@@ -138,5 +152,5 @@ setInterval(() => {
 }, 30000);
 
 server.listen(PORT, () => {
-  console.log(`$SPEEDRUN running -> http://localhost:${PORT}`);
+  console.log(`WORLD CUP RUN running -> http://localhost:${PORT}`);
 });

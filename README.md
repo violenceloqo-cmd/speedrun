@@ -1,6 +1,6 @@
-# $SPEEDRUN — Wojak Chart Runner
+# WORLD CUP RUN — Footballer Stickman Runner
 
-A multiplayer auto-runner where a stickman wojak runs up a green candle chart toward **$1,000,000,000 market cap**. Jump over red candles, clear rug pulls, duck under FUD — and watch every other connected player racing the same chart live as semi-transparent ghosts.
+A multiplayer auto-runner themed around the 2026 World Cup. Pick your nation, run as a stickman footballer in that country's kit (jersey, shorts, socks, boots), dodge defenders and the keeper, stay onside — and race every other connected player live to **lift the World Cup Trophy**.
 
 ## Run it
 
@@ -17,22 +17,27 @@ Open **http://localhost:3000** — open it in multiple tabs (or share your LAN a
 | --- | --- |
 | `SPACE` / `W` / `↑` / tap / click | Jump (press again mid-air to double jump) |
 
-- Market cap grows with distance: start at **$50K**, finish at **$1B**.
-- **First player to reach $1B wins 5 SOL.**
-- **Checkpoints** at $1M, $10M, $100M, $500M — die and you respawn at the last flag.
-- **Red candles**: jump over them.
-- **Cacti**: desert cacti on the chart — jump over.
-- **Whale dumps**: big and wide — clear them with a double jump.
-- **Rug pulls**: gaps in the chart — jump across or fall.
-- **FUD clouds** and **paper hands**: float at jump height — stay grounded to pass under.
-- The speedrun timer never stops; the hook is beating your best time to $1B.
+- On the title screen, enter a name and **pick your nation** from the 16 contenders.
+- Progress is your run along the pitch: **Group Stage → Round of 16 → Quarter-Final → Semi-Final → Final**.
+- **First player to lift the Trophy wins 5 SOL.**
+- **Stage flags** at Round of 16, Quarter-Final, Semi-Final and Final — get stopped and you respawn at the last flag.
+- **Defenders**: hurdle over them.
+- **Sliding tackles**: low to the ground — jump over.
+- **Diving keeper**: big and wide — clear it with a double jump.
+- **Touchlines**: gaps in the pitch — jump across or the ball goes out of play.
+- **Offside flags** and **red cards**: float at jump height — stay grounded to pass under.
+- The run timer never stops; the hook is beating your best time to the Trophy.
 
 ## Multiplayer
 
-- The terrain is generated from a fixed seed, so everyone runs the exact same chart.
-- Other players appear as colored ghost wojaks with name tags (no collision — pure race).
-- Live leaderboard sorted by market cap, plus toasts when someone joins, gets rugged, or hits $1B.
+- The pitch is generated from a fixed seed, so everyone runs the exact same course.
+- Other players appear as semi-transparent footballers in their nation's kit with name + flag tags (no collision — pure race).
+- Live leaderboard sorted by progress with flags, plus toasts when someone joins, is stopped, or lifts the Trophy.
 - The game stays fully playable solo if the connection drops (auto-reconnects).
+
+## Nations
+
+Brazil, Argentina, France, England, Spain, Germany, Portugal, Netherlands, USA, Mexico, Canada, Japan, Belgium, Croatia, Morocco, Uruguay.
 
 ## Stack
 

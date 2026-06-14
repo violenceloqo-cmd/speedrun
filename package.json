@@ -1,7 +1,7 @@
 {
-  "name": "speedrun-chart-runner",
-  "version": "1.0.0",
-  "description": "Wojak SPEEDRUN - multiplayer chart runner to $1B market cap",
+  "name": "world-cup-run",
+  "version": "2.0.0",
+  "description": "World Cup Run - multiplayer footballer stickman runner: pick a nation and race to lift the Trophy",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

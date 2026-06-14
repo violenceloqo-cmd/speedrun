@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>$SPEEDRUN — Run to $1B</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M4 28 L11 21 L14 24 L21 13 L19 13 L26 4 L27 14 L25 12 L16 26 L13 23 L6 30 Z' fill='%234ade80'/%3E%3C/svg%3E">
+<title>WORLD CUP RUN — Road to the Final</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M11 4 L21 4 L21 8 L25 8 L25 12 Q25 16 21 17 L21 21 L19 24 L19 27 L23 30 L9 30 L13 27 L13 24 L11 21 L11 17 Q7 16 7 12 L7 8 L11 8 Z' fill='%23ffd166'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
@@ -12,11 +12,12 @@
   :root {
     --green: #2ecc71;
     --green-bright: #4ade80;
+    --gold: #ffd166;
     --red: #ef4444;
-    --bg: #0b0f14;
-    --panel: rgba(13, 20, 28, 0.85);
+    --bg: #07120c;
+    --panel: rgba(8, 24, 16, 0.85);
     --text: #e8eef2;
-    --dim: #7d8b99;
+    --dim: #8aa092;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { height: 100%; overflow: hidden; background: var(--bg); }
@@ -112,24 +113,6 @@
     transition: opacity 1s;
   }
 
-  #contract-box {
-    position: fixed; right: 14px; bottom: 14px; z-index: 12;
-    background: var(--panel); border: 1px solid #1d2935; border-radius: 8px;
-    padding: 8px 12px; max-width: min(420px, calc(100vw - 28px));
-    pointer-events: auto; cursor: pointer;
-    -webkit-user-select: text; user-select: text;
-    transition: border-color 0.15s, box-shadow 0.15s;
-  }
-  #contract-box:hover { border-color: var(--green); box-shadow: 0 0 14px rgba(74, 222, 128, 0.2); }
-  #contract-box.copied { border-color: var(--green-bright); }
-  #contract-label {
-    font-size: 10px; color: var(--dim); letter-spacing: 2px; margin-bottom: 4px;
-  }
-  #contract-addr {
-    font-size: 11px; color: var(--green-bright); word-break: break-all; line-height: 1.4;
-  }
-  #contract-copy { font-size: 10px; color: var(--dim); margin-top: 4px; letter-spacing: 1px; }
-
   /* ---------- Live chat (docked bottom-left, out of the play area) ---------- */
   #chat {
     position: fixed; left: 14px; bottom: 14px; z-index: 9;
@@ -212,11 +195,11 @@
   .panel { text-align: center; padding: 24px; max-width: 480px; width: 100%; }
 
   .logo {
-    font-size: clamp(38px, 9vw, 64px); font-weight: 800; letter-spacing: 2px;
+    font-size: clamp(34px, 8vw, 58px); font-weight: 800; letter-spacing: 2px;
     color: var(--green-bright);
     text-shadow: 0 0 30px rgba(74, 222, 128, 0.5);
   }
-  .logo .dollar { color: #ffd166; text-shadow: 0 0 30px rgba(255, 209, 102, 0.5); }
+  .logo .cup { color: var(--gold); text-shadow: 0 0 30px rgba(255, 209, 102, 0.5); }
   .tagline { color: var(--dim); margin: 10px 0 30px; font-size: 14px; letter-spacing: 1px; }
   .tagline b { color: var(--text); }
 
@@ -227,6 +210,80 @@
     padding: 12px; outline: none; margin-bottom: 14px;
   }
   #name-input:focus { border-color: var(--green); }
+
+  #wallet-label {
+    font-size: 11px; color: var(--dim); letter-spacing: 2px;
+    margin: 4px 0 8px;
+  }
+  #wallet-note {
+    font-size: 11px; color: var(--gold); line-height: 1.5;
+    margin: 0 auto 10px; max-width: 320px; opacity: 0.85;
+  }
+  #wallet-input {
+    width: 100%; max-width: 360px;
+    background: #0f1722; border: 1px solid #2a3a4a; border-radius: 8px;
+    color: var(--text); font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 13px; text-align: center;
+    padding: 11px 12px; outline: none; margin-bottom: 22px;
+    word-break: break-all;
+  }
+  #wallet-input:focus { border-color: var(--green); }
+  #wallet-input.invalid { border-color: var(--red); }
+
+  /* copyable wallet display on the win screen */
+  #win-wallet-wrap {
+    margin: 0 auto 24px; max-width: 360px;
+  }
+  #win-wallet-cap { font-size: 11px; color: var(--dim); letter-spacing: 2px; margin-bottom: 8px; }
+  #win-wallet {
+    display: flex; align-items: center; gap: 8px;
+    background: #0f1722; border: 1px solid rgba(255, 209, 102, 0.45); border-radius: 8px;
+    padding: 10px 12px;
+  }
+  #win-wallet-addr {
+    flex: 1; min-width: 0; font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 12px; color: var(--gold); text-align: left;
+    word-break: break-all; line-height: 1.4;
+    -webkit-user-select: all; user-select: all;
+  }
+  #win-wallet-copy {
+    flex: none; cursor: pointer; pointer-events: auto;
+    background: transparent; border: 1px solid #2a3a4a; border-radius: 6px;
+    color: var(--text); font: inherit; font-size: 11px; letter-spacing: 1px;
+    padding: 6px 12px; transition: border-color 0.1s, color 0.1s;
+  }
+  #win-wallet-copy:hover { border-color: var(--green); color: var(--green-bright); }
+
+  #country-label {
+    font-size: 11px; color: var(--dim); letter-spacing: 2px;
+    margin: 4px 0 10px;
+  }
+  #country-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 8px; margin-bottom: 22px;
+    max-height: 220px; overflow-y: auto; padding: 2px;
+    scrollbar-width: thin; scrollbar-color: #2a4a38 transparent;
+  }
+  #country-grid::-webkit-scrollbar { width: 7px; }
+  #country-grid::-webkit-scrollbar-thumb { background: #2a4a38; border-radius: 4px; }
+  .country-tile {
+    cursor: pointer; pointer-events: auto;
+    background: #0f1f17; border: 1px solid #234a36; border-radius: 9px;
+    padding: 8px 4px 7px; text-align: center;
+    transition: border-color 0.12s, transform 0.08s, box-shadow 0.12s;
+  }
+  .country-tile:hover { border-color: var(--green); transform: translateY(-1px); }
+  .country-tile.selected {
+    border-color: var(--gold);
+    box-shadow: 0 0 16px rgba(255, 209, 102, 0.35);
+    background: rgba(255, 209, 102, 0.08);
+  }
+  .country-tile .flag { font-size: 22px; line-height: 1; }
+  .country-tile .cname { font-size: 10px; color: var(--dim); margin-top: 4px; letter-spacing: 0.5px; }
+  .country-tile.selected .cname { color: var(--gold); }
+  @media (max-width: 480px) {
+    #country-grid { grid-template-columns: repeat(3, 1fr); }
+  }
 
   .btn {
     display: inline-block; cursor: pointer; pointer-events: auto;
@@ -262,10 +319,10 @@
     <div id="leaderboard"></div>
   </div>
   <div id="mcap-box">
-    <div id="mcap-title">Speedrun To 1 Billion</div>
-    <div id="mcap">$50.0K</div>
-    <div id="mcap-label">MARKET CAP &middot; TARGET $1B</div>
-    <div class="bounty">FIRST TO $1B WINS <b>5 SOL</b></div>
+    <div id="mcap-title">Road to the Final</div>
+    <div id="mcap">GROUP STAGE</div>
+    <div id="mcap-label">FINAL &middot; LIFT THE TROPHY</div>
+    <div class="bounty">FIRST TO LIFT THE TROPHY WINS <b>5 SOL</b></div>
   </div>
   <div id="timer-box">
     <div id="timer">0:00.0</div>
@@ -273,12 +330,6 @@
   </div>
   <div id="toasts"></div>
   <div id="hint">SPACE / TAP TO JUMP &middot; DOUBLE JUMP AVAILABLE</div>
-</div>
-
-<div id="contract-box" title="Click to copy contract address">
-  <div id="contract-label">CONTRACT ADDRESS</div>
-  <div id="contract-addr">uQrjYjA456qSxh2KmUw1zMjoeVJRYGdW41vukxupump</div>
-  <div id="contract-copy">click to copy</div>
 </div>
 
 <div id="chat">
@@ -298,27 +349,38 @@
 
 <div id="title-screen" class="overlay visible">
   <div class="panel">
-    <div class="logo"><span class="dollar">$</span>SPEEDRUN</div>
-    <div class="tagline">we are here &rarr; <b>$50K</b> &middot;&middot;&middot; run the chart to <b>$1B</b></div>
-    <div class="bounty" style="margin: 0 0 24px;">FIRST TO $1B WINS <b>5 SOL</b></div>
+    <div class="logo">WORLD <span class="cup">CUP</span> RUN</div>
+    <div class="tagline">Group Stage &rarr; <b>Round of 16</b> &middot;&middot;&middot; dribble all the way to <b>lift the Trophy</b></div>
+    <div class="bounty" style="margin: 0 0 24px;">FIRST TO LIFT THE TROPHY WINS <b>5 SOL</b></div>
     <br>
     <input id="name-input" maxlength="16" placeholder="your name" autocomplete="off" spellcheck="false">
-    <br>
-    <button id="start-btn" class="btn">START RUN</button>
+    <div id="country-label">PICK YOUR NATION</div>
+    <div id="country-grid"></div>
+    <div id="wallet-label">YOUR SOLANA WALLET ADDRESS</div>
+    <div id="wallet-note">Required to claim the 5 SOL bounty — if you lift the Trophy first, the reward is paid manually to this address.</div>
+    <input id="wallet-input" maxlength="64" placeholder="paste your SOL public address" autocomplete="off" spellcheck="false">
+    <button id="start-btn" class="btn">KICK OFF</button>
     <div class="controls-hint">
       <kbd>SPACE</kbd> / <kbd>TAP</kbd> jump &middot; press again to double jump<br>
-      dodge red candles &middot; clear the rug pulls &middot; duck under FUD
+      hurdle defenders &middot; clear the touchlines &middot; stay onside under the flag
     </div>
   </div>
 </div>
 
 <div id="win-screen" class="overlay">
   <div class="panel">
-    <div class="win-title">$1,000,000,000</div>
-    <div class="tagline">WAGMI. you sent it.</div>
+    <div class="win-title">CHAMPIONS OF THE WORLD</div>
+    <div class="tagline" id="win-nation">you lifted the Trophy.</div>
     <div id="win-time">0:00.0</div>
-    <div id="win-sub">deaths: <span id="win-deaths">0</span></div>
-    <button id="restart-btn" class="btn">RUN IT BACK</button>
+    <div id="win-sub">matches survived &middot; tackles taken: <span id="win-deaths">0</span></div>
+    <div id="win-wallet-wrap">
+      <div id="win-wallet-cap">REWARD WALLET (5 SOL PAID HERE)</div>
+      <div id="win-wallet">
+        <span id="win-wallet-addr">—</span>
+        <button id="win-wallet-copy" type="button">copy</button>
+      </div>
+    </div>
+    <button id="restart-btn" class="btn">PLAY AGAIN</button>
   </div>
 </div>
 
@@ -326,9 +388,34 @@
 'use strict';
 
 // =====================================================================
-//  $SPEEDRUN — wojak chart runner
-//  World coordinates: x grows right, y grows UP (like a chart).
+//  WORLD CUP RUN — footballer stickman runner
+//  Pick a nation, run the pitch, dodge defenders, lift the Trophy.
+//  World coordinates: x grows right, y grows UP.
 // =====================================================================
+
+// ---------- nations (curated 2026 contenders) ----------
+// jersey/shorts/socks/boots are kit colors used to draw the stickman.
+const NATIONS = [
+  { code: 'BRA', name: 'Brazil',      flag: '🇧🇷', jersey: '#fcd116', shorts: '#1f3a93', socks: '#ffffff', boots: '#111111', accent: '#1f9e54' },
+  { code: 'ARG', name: 'Argentina',   flag: '🇦🇷', jersey: '#75aadb', shorts: '#111827', socks: '#ffffff', boots: '#ffffff', accent: '#f4d03f' },
+  { code: 'FRA', name: 'France',      flag: '🇫🇷', jersey: '#1e3a8a', shorts: '#ffffff', socks: '#dc2626', boots: '#111111', accent: '#dc2626' },
+  { code: 'ENG', name: 'England',     flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', jersey: '#ffffff', shorts: '#1e3a8a', socks: '#ffffff', boots: '#111111', accent: '#dc2626' },
+  { code: 'ESP', name: 'Spain',       flag: '🇪🇸', jersey: '#dc2626', shorts: '#1e3a8a', socks: '#1e3a8a', boots: '#111111', accent: '#fcd116' },
+  { code: 'GER', name: 'Germany',     flag: '🇩🇪', jersey: '#f3f4f6', shorts: '#111827', socks: '#f3f4f6', boots: '#111111', accent: '#dc2626' },
+  { code: 'POR', name: 'Portugal',    flag: '🇵🇹', jersey: '#dc2626', shorts: '#15803d', socks: '#dc2626', boots: '#111111', accent: '#15803d' },
+  { code: 'NED', name: 'Netherlands', flag: '🇳🇱', jersey: '#f97316', shorts: '#111827', socks: '#f97316', boots: '#111111', accent: '#1e3a8a' },
+  { code: 'USA', name: 'USA',         flag: '🇺🇸', jersey: '#ffffff', shorts: '#1e3a8a', socks: '#ffffff', boots: '#111111', accent: '#dc2626' },
+  { code: 'MEX', name: 'Mexico',      flag: '🇲🇽', jersey: '#15803d', shorts: '#ffffff', socks: '#dc2626', boots: '#111111', accent: '#dc2626' },
+  { code: 'CAN', name: 'Canada',      flag: '🇨🇦', jersey: '#dc2626', shorts: '#ffffff', socks: '#dc2626', boots: '#111111', accent: '#ffffff' },
+  { code: 'JPN', name: 'Japan',       flag: '🇯🇵', jersey: '#1e40af', shorts: '#1e40af', socks: '#1e40af', boots: '#111111', accent: '#dc2626' },
+  { code: 'BEL', name: 'Belgium',     flag: '🇧🇪', jersey: '#dc2626', shorts: '#111827', socks: '#fcd116', boots: '#111111', accent: '#fcd116' },
+  { code: 'CRO', name: 'Croatia',     flag: '🇭🇷', jersey: '#dc2626', shorts: '#ffffff', socks: '#1e3a8a', boots: '#111111', accent: '#ffffff' },
+  { code: 'MAR', name: 'Morocco',     flag: '🇲🇦', jersey: '#c1272d', shorts: '#15803d', socks: '#c1272d', boots: '#111111', accent: '#15803d' },
+  { code: 'URU', name: 'Uruguay',     flag: '🇺🇾', jersey: '#5b9bd5', shorts: '#111827', socks: '#111827', boots: '#111111', accent: '#ffffff' },
+];
+const NATION_BY_CODE = Object.fromEntries(NATIONS.map((n) => [n.code, n]));
+const DEFAULT_KIT = { jersey: '#e8eef2', shorts: '#334155', socks: '#e8eef2', boots: '#111111', accent: '#4ade80' };
+function kitFor(code) { return NATION_BY_CODE[code] || DEFAULT_KIT; }
 
 // ---------- canvas ----------
 const canvas = document.getElementById('game');
@@ -359,23 +446,30 @@ function mulberry32(seed) {
 }
 const WORLD_SEED = 0x5BEED;
 
-// ---------- market cap model ----------
-const M0 = 50e3, M_WIN = 1e9, X_WIN = 60000;
-const K = Math.log(M_WIN / M0) / X_WIN;
-const mcapAt = (x) => Math.min(M_WIN, M0 * Math.exp(K * Math.max(0, x)));
-const xForMcap = (m) => Math.log(m / M0) / K;
+// ---------- tournament progression model ----------
+// Progress is just distance run; stages mark how far along the bracket you are.
+const X_WIN = 756000;
+const METERS_PER_UNIT = 0.013; // world units -> on-screen "meters" for the HUD
 
-function fmtMcap(m) {
-  if (m >= 1e9) return '$' + (m / 1e9).toFixed(2).replace(/\.?0+$/, '') + 'B';
-  if (m >= 1e6) return '$' + (m / 1e6).toFixed(m >= 1e8 ? 0 : 1) + 'M';
-  return '$' + (m / 1e3).toFixed(1) + 'K';
+const STAGES = [
+  { x: 0,            label: 'GROUP STAGE' },
+  { x: X_WIN * 0.12, label: 'ROUND OF 16' },
+  { x: X_WIN * 0.27, label: 'QUARTER-FINAL' },
+  { x: X_WIN * 0.46, label: 'SEMI-FINAL' },
+  { x: X_WIN * 0.70, label: 'FINAL' },
+];
+// Respawn flags = every stage past the group stage.
+const CHECKPOINTS = STAGES.slice(1).map((s) => ({ x: s.x, label: s.label }));
+
+function stageAt(x) {
+  let label = STAGES[0].label;
+  for (const s of STAGES) { if (x >= s.x) label = s.label; }
+  return label;
 }
 function fmtTime(s) {
   const m = Math.floor(s / 60);
   return m + ':' + (s - m * 60).toFixed(1).padStart(4, '0');
 }
-
-const CHECKPOINTS = [1e6, 1e7, 1e8, 5e8].map((m) => ({ m, x: xForMcap(m), label: fmtMcap(m) }));
 
 // ---------- terrain ----------
 // Ground is a list of "pieces" (polylines). Gaps between pieces = rug pulls.
@@ -403,26 +497,26 @@ function maybeObstacle(x0, x1, y0, y1, diff) {
   const oy = lerp(y0, y1, t);
   const roll = rng();
   if (roll < 0.34) {
-    // red candle: jump over it
-    const w = 26 + rng() * 22;
-    const h = 55 + rng() * (55 + 60 * diff);
-    terrain.obstacles.push({ type: 'candle', x: ox - w / 2, y: oy, w, h: Math.min(h, 150), wick: 18 + rng() * 26 });
+    // standing defender: hurdle over them
+    const w = 26 + rng() * 14;
+    const h = 60 + rng() * (40 + 40 * diff);
+    terrain.obstacles.push({ type: 'defender', x: ox - w / 2, y: oy, w, h: Math.min(h, 130) });
   } else if (roll < 0.52) {
-    // cactus: ground obstacle, jump over
-    const w = 38 + rng() * 14, h = 58 + rng() * 22;
-    terrain.obstacles.push({ type: 'cactus', x: ox - w / 2, y: oy, w, h });
+    // sliding tackle: low ground obstacle, jump over
+    const w = 52 + rng() * 22, h = 30 + rng() * 14;
+    terrain.obstacles.push({ type: 'tackle', x: ox - w / 2, y: oy, w, h });
   } else if (roll < 0.66 && diff > 0.08) {
-    // whale dump: big and wide, needs a well-timed (double) jump
-    const w = 110 + rng() * 40, h = 62 + rng() * 16;
-    terrain.obstacles.push({ type: 'whale', x: ox - w / 2, y: oy, w, h });
+    // diving keeper: big and wide, needs a well-timed (double) jump
+    const w = 110 + rng() * 40, h = 56 + rng() * 16;
+    terrain.obstacles.push({ type: 'keeper', x: ox - w / 2, y: oy, w, h });
   } else if (roll < 0.84) {
-    // FUD cloud: floats at jump height — stay grounded to pass under
-    const w = 78 + rng() * 40, h = 40;
-    terrain.obstacles.push({ type: 'cloud', x: ox - w / 2, y: oy + 96, w, h, puff: rng() });
+    // offside flag: floats at jump height — stay grounded to pass under
+    const w = 78 + rng() * 30, h = 40;
+    terrain.obstacles.push({ type: 'offside', x: ox - w / 2, y: oy + 96, w, h, wave: rng() });
   } else {
-    // paper hands: floating low — stay grounded to pass under
-    const w = 64 + rng() * 24, h = 44;
-    terrain.obstacles.push({ type: 'paper', x: ox - w / 2, y: oy + 90, w, h });
+    // red card: floating low — stay grounded to pass under
+    const w = 56 + rng() * 18, h = 44;
+    terrain.obstacles.push({ type: 'redcard', x: ox - w / 2, y: oy + 90, w, h });
   }
 }
 
@@ -470,18 +564,32 @@ function genTo(x) {
 }
 
 // Ground height at world x, or null if over a gap.
+// A cursor hint (_gyPiece/_gySeg) makes the common forward-monotonic query
+// O(1); it falls back to a full scan on a miss, so it stays correct even
+// after passed terrain is pruned.
+let _gyPiece = null, _gySeg = 1;
+function segYAt(piece, x) {
+  let j = clamp(_gySeg, 1, piece.length - 1);
+  if (x > piece[j].x) {
+    while (j < piece.length - 1 && x > piece[j].x) j++;
+  } else {
+    while (j > 1 && x <= piece[j - 1].x) j--;
+  }
+  _gySeg = j;
+  const a = piece[j - 1], b = piece[j];
+  const t = b.x === a.x ? 1 : (x - a.x) / (b.x - a.x);
+  return lerp(a.y, b.y, t);
+}
 function groundYAt(x) {
   const pieces = terrain.pieces;
+  if (_gyPiece && x >= _gyPiece[0].x && x <= _gyPiece[_gyPiece.length - 1].x) {
+    return segYAt(_gyPiece, x);
+  }
   for (let i = 0; i < pieces.length; i++) {
     const piece = pieces[i];
     if (x < piece[0].x || x > piece[piece.length - 1].x) continue;
-    for (let j = 1; j < piece.length; j++) {
-      if (x <= piece[j].x) {
-        const a = piece[j - 1], b = piece[j];
-        const t = b.x === a.x ? 1 : (x - a.x) / (b.x - a.x);
-        return lerp(a.y, b.y, t);
-      }
-    }
+    _gyPiece = piece; _gySeg = 1;
+    return segYAt(piece, x);
   }
   return null;
 }
@@ -494,6 +602,21 @@ function solidGroundAfter(x) {
     if (gy !== null) return { x: probe, y: gy };
   }
   return { x, y: 0 };
+}
+
+// Drop geometry well behind world-x `x`. Respawn never goes earlier than the
+// current checkpoint and the camera never looks back this far, so pruning keeps
+// memory/CPU bounded to roughly one stage over the ~20-minute run.
+function pruneBehind(x) {
+  const cut = x - 4000;
+  if (cut <= 0) return;
+  const pieces = terrain.pieces;
+  let firstKeep = 0;
+  while (firstKeep < pieces.length - 1 && pieces[firstKeep][pieces[firstKeep].length - 1].x < cut) firstKeep++;
+  if (firstKeep > 0) pieces.splice(0, firstKeep);
+  terrain.gaps = terrain.gaps.filter((g) => g.x1 >= cut);
+  terrain.obstacles = terrain.obstacles.filter((o) => o.x + o.w >= cut);
+  _gyPiece = null; // cursor may now reference pruned geometry
 }
 
 function gapAt(x) {
@@ -521,7 +644,7 @@ const player = {
   phase: 0, // run-cycle phase
 };
 
-function speedAt(x) { return 290 + 250 * clamp(x / X_WIN, 0, 1); }
+function speedAt(x) { return 420 + 480 * clamp(x / X_WIN, 0, 1); }
 
 function startRun() {
   player.x = 0; player.y = 0; player.vy = 0;
@@ -566,17 +689,25 @@ function die(reason) {
   player.deaths++;
   spawnDeathParticles(player.x, player.y + 32);
   sfx.death();
-  net.sendEvent('death', fmtMcap(mcapAt(player.x)));
-  toast(reason + ' — back to ' + (player.checkpointIdx >= 0 ? CHECKPOINTS[player.checkpointIdx].label : 'the start'), 'bad');
+  net.sendEvent('death', stageAt(player.x));
+  toast(reason + ' — back to ' + (player.checkpointIdx >= 0 ? CHECKPOINTS[player.checkpointIdx].label : 'kickoff'), 'bad');
 }
 
 function winRun() {
   player.state = 'won';
   sfx.win();
   net.sendEvent('win', fmtTime(player.runTime));
-  spawnConfetti();
+  const nation = NATION_BY_CODE[myCountry];
+  const kit = kitFor(myCountry);
+  spawnConfetti([kit.jersey, kit.shorts, kit.accent, '#ffd166', '#ffffff']);
+  const nationEl = document.getElementById('win-nation');
+  if (nationEl) nationEl.innerHTML = nation
+    ? nation.flag + ' <b>' + escapeHtml(nation.name) + '</b> lifted the Trophy!'
+    : 'you lifted the Trophy.';
   document.getElementById('win-time').textContent = fmtTime(player.runTime);
   document.getElementById('win-deaths').textContent = player.deaths;
+  const walletAddrEl = document.getElementById('win-wallet-addr');
+  if (walletAddrEl) walletAddrEl.textContent = walletAddress || '—';
   setTimeout(() => document.getElementById('win-screen').classList.add('visible'), 1100);
 }
 
@@ -629,11 +760,11 @@ function updatePlayer(dt) {
   // fell into a rug pull — die as soon as you drop below the chart line inside a gap
   const activeGap = gapAt(player.x);
   if (!player.grounded && activeGap && player.y < activeGap.y - 50) {
-    die('rugged');
+    die('ball out of play');
     return;
   }
   if (!player.grounded && player.y < player.lastGroundY - 160) {
-    die('rugged');
+    die('ball out of play');
     return;
   }
 
@@ -642,7 +773,8 @@ function updatePlayer(dt) {
   if (nextIdx < CHECKPOINTS.length && player.x >= CHECKPOINTS[nextIdx].x) {
     player.checkpointIdx = nextIdx;
     sfx.checkpoint();
-    toast('CHECKPOINT — ' + CHECKPOINTS[nextIdx].label + ' market cap', 'good');
+    toast('QUALIFIED — ' + CHECKPOINTS[nextIdx].label, 'good');
+    pruneBehind(CHECKPOINTS[nextIdx].x);
   }
 
   // win
@@ -654,7 +786,7 @@ function updatePlayer(dt) {
     if (o.x > player.x + 200) break;
     if (o.x + o.w < player.x - 200) continue;
     if (pb.x < o.x + o.w && pb.x + pb.w > o.x && pb.y < o.y + o.h && pb.y + pb.h > o.y) {
-      die({ candle: 'red candle', cactus: 'impaled on a cactus', whale: 'whale dumped on you', cloud: 'hit FUD', paper: 'paper handed' }[o.type] || 'rekt');
+      die({ defender: 'tackled by a defender', tackle: 'slide-tackled', keeper: 'denied by the keeper', offside: 'caught offside', redcard: 'sent off' }[o.type] || 'fouled');
       return;
     }
   }
@@ -686,8 +818,8 @@ function spawnDeathParticles(x, y) {
   }
 }
 const confetti = [];
-function spawnConfetti() {
-  const colors = ['#4ade80', '#ffd166', '#4dd2ff', '#ff79c6', '#a78bfa'];
+function spawnConfetti(palette) {
+  const colors = palette && palette.length ? palette : ['#4ade80', '#ffd166', '#4dd2ff', '#ff79c6', '#a78bfa'];
   for (let i = 0; i < 140; i++) {
     confetti.push({
       x: Math.random() * W, y: -20 - Math.random() * H,
@@ -715,151 +847,194 @@ function updateParticles(dt) {
   }
 }
 
-// ---------- wojak drawing ----------
-// Stickman body + procedurally drawn wojak head, side profile facing right.
+// ---------- footballer drawing ----------
+// Stickman footballer in a national kit, facing right.
 // (x, y) = feet position in SCREEN coordinates.
-function drawWojak(c, x, y, phase, opts) {
+function drawBoot(c, p, color) {
+  c.save();
+  c.fillStyle = color;
+  c.beginPath();
+  c.moveTo(p.x - 4, p.y - 2);
+  c.lineTo(p.x + 8, p.y - 2);
+  c.quadraticCurveTo(p.x + 12, p.y - 1, p.x + 9, p.y + 3);
+  c.lineTo(p.x - 4, p.y + 3);
+  c.closePath();
+  c.fill();
+  c.restore();
+}
+function drawBall(c, cx, cy, r) {
+  c.save();
+  c.fillStyle = '#ffffff';
+  c.beginPath(); c.arc(cx, cy, r, 0, 7); c.fill();
+  c.lineWidth = 1; c.strokeStyle = '#222'; c.stroke();
+  c.fillStyle = '#222';
+  c.beginPath(); c.arc(cx, cy, r * 0.34, 0, 7); c.fill();
+  c.restore();
+}
+function drawRunner(c, x, y, phase, opts) {
   const o = opts || {};
-  const col = o.color || '#e8eef2';
+  const kit = o.kit || DEFAULT_KIT;
+  const nameCol = o.color || kit.accent || '#e8eef2';
   const alpha = o.alpha != null ? o.alpha : 1;
   const dead = !!o.dead;
   const airborne = !!o.airborne;
+  const skin = '#e6b07f';
 
   c.save();
   c.globalAlpha = alpha;
-  c.lineWidth = 3;
   c.lineCap = 'round';
   c.lineJoin = 'round';
-  c.strokeStyle = col;
 
-  const hipY = y - 30, neckY = y - 56, shY = y - 50;
-  const headCX = x + 2, headCY = y - 70;
+  const hipY = y - 28, neckY = y - 56, shY = y - 50;
+  const headCX = x + 1, headCY = y - 68, headR = 9;
 
-  // legs
-  c.beginPath();
+  // ---- legs + boots (back leg first for layering) ----
+  let foot1, knee1, foot2, knee2;
   if (dead) {
-    c.moveTo(x, hipY); c.lineTo(x - 16, y - 6);
-    c.moveTo(x, hipY); c.lineTo(x + 14, y - 4);
+    knee1 = { x: x - 9, y: hipY + 10 }; foot1 = { x: x - 18, y: y - 4 };
+    knee2 = { x: x + 8, y: hipY + 12 }; foot2 = { x: x + 16, y: y - 2 };
   } else if (airborne) {
-    c.moveTo(x, hipY); c.lineTo(x + 10, hipY + 12); c.lineTo(x + 18, hipY + 2);
-    c.moveTo(x, hipY); c.lineTo(x - 6, hipY + 14); c.lineTo(x + 4, hipY + 20);
+    knee1 = { x: x + 10, y: hipY + 10 }; foot1 = { x: x + 18, y: hipY + 2 };
+    knee2 = { x: x - 6, y: hipY + 13 }; foot2 = { x: x + 4, y: hipY + 19 };
   } else {
     const s1 = Math.sin(phase), s2 = Math.sin(phase + Math.PI);
-    c.moveTo(x, hipY);
-    c.lineTo(x + s1 * 9, hipY + 16);
-    c.lineTo(x + s1 * 15 + 3, y - Math.max(0, -s1) * 8);
-    c.moveTo(x, hipY);
-    c.lineTo(x + s2 * 9, hipY + 16);
-    c.lineTo(x + s2 * 15 + 3, y - Math.max(0, -s2) * 8);
+    knee1 = { x: x + s1 * 9, y: hipY + 15 }; foot1 = { x: x + s1 * 15 + 3, y: y - Math.max(0, -s1) * 8 };
+    knee2 = { x: x + s2 * 9, y: hipY + 15 }; foot2 = { x: x + s2 * 15 + 3, y: y - Math.max(0, -s2) * 8 };
   }
-  c.stroke();
-
-  // torso
+  c.strokeStyle = kit.socks; c.lineWidth = 4;
   c.beginPath();
-  c.moveTo(x, hipY); c.lineTo(x + 1, neckY);
+  c.moveTo(x, hipY); c.lineTo(knee2.x, knee2.y); c.lineTo(foot2.x, foot2.y);
   c.stroke();
-
-  // arms
+  drawBoot(c, foot2, kit.boots);
   c.beginPath();
-  if (dead) {
-    c.moveTo(x, shY); c.lineTo(x - 14, shY + 16);
-    c.moveTo(x, shY); c.lineTo(x + 12, shY + 18);
-  } else if (airborne) {
-    c.moveTo(x, shY); c.lineTo(x + 12, shY - 8); c.lineTo(x + 20, shY - 16);
-    c.moveTo(x, shY); c.lineTo(x - 8, shY - 6); c.lineTo(x - 14, shY - 14);
-  } else {
-    const a1 = Math.sin(phase + Math.PI), a2 = Math.sin(phase);
-    c.moveTo(x, shY); c.lineTo(x + a1 * 8, shY + 9); c.lineTo(x + a1 * 13 + 5, shY + 14);
-    c.moveTo(x, shY); c.lineTo(x + a2 * 8, shY + 9); c.lineTo(x + a2 * 13 + 5, shY + 14);
-  }
+  c.moveTo(x, hipY); c.lineTo(knee1.x, knee1.y); c.lineTo(foot1.x, foot1.y);
   c.stroke();
+  drawBoot(c, foot1, kit.boots);
 
-  // ---- wojak head (side profile, facing right) ----
-  c.fillStyle = dead ? '#ffccd5' : '#f1f1ee';
+  // ---- shorts ----
+  c.fillStyle = kit.shorts;
   c.beginPath();
-  // bald dome + face profile with nose bump and chin
-  c.moveTo(headCX - 11, headCY + 6);
-  c.bezierCurveTo(headCX - 14, headCY - 8, headCX - 6, headCY - 16, headCX + 2, headCY - 16);
-  c.bezierCurveTo(headCX + 10, headCY - 16, headCX + 14, headCY - 9, headCX + 13, headCY - 2); // forehead
-  c.lineTo(headCX + 12, headCY + 1);
-  c.quadraticCurveTo(headCX + 17, headCY + 4, headCX + 12, headCY + 6); // nose
-  c.quadraticCurveTo(headCX + 13, headCY + 11, headCX + 8, headCY + 13); // mouth area / chin
-  c.quadraticCurveTo(headCX - 2, headCY + 16, headCX - 8, headCY + 12); // jaw
+  c.moveTo(x - 8, hipY - 5);
+  c.lineTo(x + 9, hipY - 5);
+  c.lineTo(x + 10, hipY + 8);
+  c.lineTo(x + 1, hipY + 4);
+  c.lineTo(x - 9, hipY + 8);
   c.closePath();
   c.fill();
-  c.lineWidth = 2;
-  c.strokeStyle = '#22272e';
+  c.lineWidth = 1; c.strokeStyle = 'rgba(0,0,0,0.3)'; c.stroke();
+
+  // ---- arms (skin) ----
+  let hand1, elbow1, hand2, elbow2;
+  if (dead) {
+    elbow1 = { x: x - 8, y: shY + 10 }; hand1 = { x: x - 15, y: shY + 16 };
+    elbow2 = { x: x + 7, y: shY + 11 }; hand2 = { x: x + 13, y: shY + 18 };
+  } else if (airborne) {
+    elbow1 = { x: x + 10, y: shY - 6 }; hand1 = { x: x + 19, y: shY - 15 };
+    elbow2 = { x: x - 7, y: shY - 5 }; hand2 = { x: x - 13, y: shY - 13 };
+  } else {
+    const a1 = Math.sin(phase + Math.PI), a2 = Math.sin(phase);
+    elbow1 = { x: x + a1 * 8, y: shY + 9 }; hand1 = { x: x + a1 * 13 + 5, y: shY + 14 };
+    elbow2 = { x: x + a2 * 8, y: shY + 9 }; hand2 = { x: x + a2 * 13 + 5, y: shY + 14 };
+  }
+  c.strokeStyle = skin; c.lineWidth = 3;
+  c.beginPath();
+  c.moveTo(x, shY + 2); c.lineTo(elbow2.x, elbow2.y); c.lineTo(hand2.x, hand2.y);
+  c.moveTo(x, shY + 2); c.lineTo(elbow1.x, elbow1.y); c.lineTo(hand1.x, hand1.y);
   c.stroke();
 
-  // face details
-  c.strokeStyle = '#22272e';
-  c.fillStyle = '#22272e';
-  c.lineWidth = 1.6;
+  // ---- jersey ----
+  c.fillStyle = kit.jersey;
+  c.beginPath();
+  c.moveTo(x - 9, shY - 1);
+  c.lineTo(x + 10, shY - 1);
+  c.lineTo(x + 9, hipY - 3);
+  c.lineTo(x - 8, hipY - 3);
+  c.closePath();
+  c.fill();
+  c.lineWidth = 1; c.strokeStyle = 'rgba(0,0,0,0.3)'; c.stroke();
+  // accent collar stripe
+  c.fillStyle = kit.accent;
+  c.fillRect(x - 9, shY - 1, 19, 3);
+
+  // ---- neck + head ----
+  c.strokeStyle = skin; c.lineWidth = 3;
+  c.beginPath(); c.moveTo(x + 1, neckY); c.lineTo(x + 1, shY); c.stroke();
+
+  c.fillStyle = dead ? '#f0c4a4' : skin;
+  c.beginPath(); c.arc(headCX, headCY, headR, 0, 7); c.fill();
+  c.lineWidth = 1.4; c.strokeStyle = 'rgba(0,0,0,0.35)'; c.stroke();
+  // hair cap (top half)
+  c.fillStyle = '#2b2320';
+  c.beginPath(); c.arc(headCX, headCY - 1, headR, Math.PI, 2 * Math.PI); c.fill();
+
+  // face (facing right)
   if (dead) {
-    // X eye + tears
+    c.strokeStyle = '#1a1a1a'; c.lineWidth = 1.4;
     c.beginPath();
-    c.moveTo(headCX + 3, headCY - 4); c.lineTo(headCX + 9, headCY + 1);
-    c.moveTo(headCX + 9, headCY - 4); c.lineTo(headCX + 3, headCY + 1);
+    c.moveTo(headCX + 2, headCY - 2); c.lineTo(headCX + 7, headCY + 2);
+    c.moveTo(headCX + 7, headCY - 2); c.lineTo(headCX + 2, headCY + 2);
     c.stroke();
-    c.fillStyle = '#4dd2ff';
-    c.beginPath(); c.arc(headCX + 5, headCY + 6, 1.7, 0, 7); c.fill();
-    c.beginPath(); c.arc(headCX + 7, headCY + 10, 1.4, 0, 7); c.fill();
   } else {
-    // resigned wojak eye + brow
-    c.beginPath(); c.moveTo(headCX + 2, headCY - 5); c.lineTo(headCX + 9, headCY - 4); c.stroke(); // brow
-    c.beginPath(); c.ellipse(headCX + 6, headCY - 1.5, 2.6, 1.6, 0, 0, 7); c.stroke();
-    c.beginPath(); c.arc(headCX + 6.6, headCY - 1.5, 0.9, 0, 7); c.fill(); // pupil
-    c.beginPath(); c.moveTo(headCX + 5, headCY + 8); c.quadraticCurveTo(headCX + 8, headCY + 7, headCX + 10, headCY + 8.5); c.stroke(); // flat mouth
-    c.beginPath(); c.arc(headCX - 5, headCY + 2, 2.6, -1.2, 1.4); c.stroke(); // ear
+    c.fillStyle = '#1a1a1a';
+    c.beginPath(); c.arc(headCX + 4, headCY - 1, 1.3, 0, 7); c.fill();
+    c.strokeStyle = '#1a1a1a'; c.lineWidth = 1.2;
+    c.beginPath(); c.moveTo(headCX + 2, headCY + 5); c.quadraticCurveTo(headCX + 5, headCY + 7, headCX + 8, headCY + 5); c.stroke();
   }
 
-  // name tag
+  // ball at the lead foot while running on the ground
+  if (!airborne && !dead) {
+    drawBall(c, x + 21, y - 5, 6);
+  }
+
+  // name + flag tag
   if (o.name) {
     c.globalAlpha = Math.min(1, alpha + 0.25);
     c.font = '700 11px ui-monospace, Menlo, monospace';
     c.textAlign = 'center';
-    c.fillStyle = col;
-    c.fillText(o.name, x, y - 96);
+    c.fillStyle = nameCol;
+    c.fillText((o.flag ? o.flag + ' ' : '') + o.name, x, y - 92);
   }
   c.restore();
 }
 
 // ---------- rendering ----------
 function drawBackground() {
-  ctx.fillStyle = '#0b0f14';
+  // stadium night sky -> pitch gradient
+  const sky = ctx.createLinearGradient(0, 0, 0, H);
+  sky.addColorStop(0, '#0a1f14');
+  sky.addColorStop(0.45, '#0c2a1a');
+  sky.addColorStop(1, '#0f3a22');
+  ctx.fillStyle = sky;
   ctx.fillRect(0, 0, W, H);
+
+  // floodlight glows in the upper corners
+  ctx.save();
+  for (const fxr of [0.18, 0.82]) {
+    const g = ctx.createRadialGradient(W * fxr, H * 0.05, 0, W * fxr, H * 0.05, H * 0.6);
+    g.addColorStop(0, 'rgba(220, 245, 230, 0.10)');
+    g.addColorStop(1, 'rgba(220, 245, 230, 0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+  }
+  ctx.restore();
+
+  // world-locked grass stripes (vertical mowing bands)
+  const stripe = 150;
+  ctx.save();
+  for (let gx = Math.floor(cam.x / stripe) * stripe; gx < cam.x + W + stripe; gx += stripe) {
+    const band = Math.round(gx / stripe);
+    ctx.fillStyle = band % 2 ? 'rgba(255,255,255,0.018)' : 'rgba(0,0,0,0.05)';
+    ctx.fillRect(sx(gx), 0, stripe, H);
+  }
+  ctx.restore();
 
   // watermark
   ctx.save();
-  ctx.globalAlpha = 0.035;
-  ctx.font = '800 ' + Math.min(140, W * 0.13) + 'px ui-monospace, Menlo, monospace';
+  ctx.globalAlpha = 0.04;
+  ctx.font = '800 ' + Math.min(120, W * 0.11) + 'px ui-monospace, Menlo, monospace';
   ctx.textAlign = 'center';
-  ctx.fillStyle = '#4ade80';
-  ctx.fillText('$SPEEDRUN', W / 2, H * 0.5);
-  ctx.restore();
-
-  // grid (world-locked)
-  const grid = 260;
-  ctx.strokeStyle = 'rgba(125, 139, 153, 0.08)';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  for (let gx = Math.floor(cam.x / grid) * grid; gx < cam.x + W + grid; gx += grid) {
-    ctx.moveTo(sx(gx), 0); ctx.lineTo(sx(gx), H);
-  }
-  for (let gy = Math.floor(cam.y / grid) * grid; gy < cam.y + H + grid; gy += grid) {
-    ctx.moveTo(0, sy(gy)); ctx.lineTo(W, sy(gy));
-  }
-  ctx.stroke();
-
-  // faint price-axis labels on the left (decorative, scales with height)
-  ctx.save();
-  ctx.font = '10px ui-monospace, Menlo, monospace';
-  ctx.fillStyle = 'rgba(125, 139, 153, 0.30)';
-  ctx.textAlign = 'left';
-  for (let gy = Math.floor(cam.y / grid) * grid; gy < cam.y + H + grid; gy += grid) {
-    if (gy < 0) continue;
-    ctx.fillText(fmtMcap(mcapAt(gy * (X_WIN / 14000))), 8, sy(gy) - 4);
-  }
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText('ROAD TO GLORY', W / 2, H * 0.5);
   ctx.restore();
 }
 
@@ -882,19 +1057,19 @@ function drawTerrain() {
     ctx.lineTo(sx(piece[0].x), H + 40);
     ctx.closePath();
     const grad = ctx.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0, 'rgba(46, 204, 113, 0.16)');
-    grad.addColorStop(1, 'rgba(46, 204, 113, 0.0)');
+    grad.addColorStop(0, 'rgba(34, 160, 90, 0.42)');
+    grad.addColorStop(1, 'rgba(15, 58, 34, 0.1)');
     ctx.fillStyle = grad;
     ctx.fill();
 
-    // glowing chart line
+    // chalk pitch line along the top of the grass
     ctx.beginPath();
     ctx.moveTo(sx(piece[0].x), sy(piece[0].y));
     for (let i = 1; i < piece.length; i++) ctx.lineTo(sx(piece[i].x), sy(piece[i].y));
-    ctx.shadowColor = '#2ecc71';
-    ctx.shadowBlur = 14;
-    ctx.strokeStyle = '#34d97b';
-    ctx.lineWidth = 5;
+    ctx.shadowColor = 'rgba(255,255,255,0.5)';
+    ctx.shadowBlur = 10;
+    ctx.strokeStyle = '#f4fff8';
+    ctx.lineWidth = 4;
     ctx.stroke();
     ctx.shadowBlur = 0;
   }
@@ -906,149 +1081,139 @@ function drawObstacles() {
   for (const o of terrain.obstacles) {
     if (o.x + o.w < xMin || o.x > xMax) continue;
 
-    if (o.type === 'candle') {
-      const x0 = sx(o.x), yBot = sy(o.y), yTop = sy(o.y + o.h);
-      // wick
-      ctx.strokeStyle = '#ef4444';
-      ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      ctx.moveTo(x0 + o.w / 2, yTop);
-      ctx.lineTo(x0 + o.w / 2, sy(o.y + o.h + o.wick));
-      ctx.stroke();
-      // body
-      ctx.save();
-      ctx.shadowColor = '#ef4444';
-      ctx.shadowBlur = 10;
-      ctx.fillStyle = '#dc2626';
-      ctx.fillRect(x0, yTop, o.w, yBot - yTop);
-      ctx.restore();
-      ctx.strokeStyle = '#7f1d1d';
-      ctx.lineWidth = 1.5;
-      ctx.strokeRect(x0, yTop, o.w, yBot - yTop);
-    } else if (o.type === 'cactus') {
-      // desert cactus — jump over
-      const bx = sx(o.x), by = sy(o.y);
-      const w = o.w, h = o.h;
+    if (o.type === 'defender') {
+      // standing opponent — hurdle over them
+      const bx = sx(o.x), by = sy(o.y), w = o.w, h = o.h;
       const cx = bx + w / 2;
       ctx.save();
-      ctx.fillStyle = '#16a34a';
-      ctx.strokeStyle = '#14532d';
-      ctx.lineWidth = 1.5;
-      // main trunk
-      const tw = w * 0.34;
-      ctx.fillRect(cx - tw / 2, by - h, tw, h);
-      ctx.strokeRect(cx - tw / 2, by - h, tw, h);
-      // left arm
-      const armH = h * 0.38, armW = w * 0.28;
-      ctx.fillRect(cx - tw / 2 - armW, by - h * 0.72, armW, armH);
-      ctx.strokeRect(cx - tw / 2 - armW, by - h * 0.72, armW, armH);
-      ctx.fillRect(cx - tw / 2 - armW, by - h * 0.72 - armW * 0.9, armW * 0.55, armW * 0.9);
-      ctx.strokeRect(cx - tw / 2 - armW, by - h * 0.72 - armW * 0.9, armW * 0.55, armW * 0.9);
-      // right arm
-      ctx.fillRect(cx + tw / 2, by - h * 0.55, armW, armH * 0.85);
-      ctx.strokeRect(cx + tw / 2, by - h * 0.55, armW, armH * 0.85);
-      ctx.fillRect(cx + tw / 2 + armW * 0.45, by - h * 0.55 - armW * 0.8, armW * 0.55, armW * 0.8);
-      ctx.strokeRect(cx + tw / 2 + armW * 0.45, by - h * 0.55 - armW * 0.8, armW * 0.55, armW * 0.8);
-      // spines
-      ctx.strokeStyle = '#86efac';
-      ctx.lineWidth = 1;
-      for (let i = 0; i < 6; i++) {
-        const sy2 = by - h * (0.15 + i * 0.13);
-        ctx.beginPath();
-        ctx.moveTo(cx - tw / 2 - 2, sy2); ctx.lineTo(cx - tw / 2 - 8, sy2 - 3);
-        ctx.moveTo(cx + tw / 2 + 2, sy2 + 4); ctx.lineTo(cx + tw / 2 + 8, sy2 + 1);
-        ctx.stroke();
-      }
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      // legs
+      ctx.strokeStyle = '#1f2937'; ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(cx, by - h * 0.42); ctx.lineTo(cx - 6, by);
+      ctx.moveTo(cx, by - h * 0.42); ctx.lineTo(cx + 6, by);
+      ctx.stroke();
+      // jersey (rival red/white)
+      ctx.fillStyle = '#dc2626';
+      ctx.fillRect(cx - w * 0.34, by - h, w * 0.68, h * 0.6);
+      ctx.fillStyle = 'rgba(255,255,255,0.85)';
+      ctx.fillRect(cx - w * 0.06, by - h, w * 0.12, h * 0.6);
+      // arms out, defending
+      ctx.strokeStyle = '#e6b07f'; ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(cx - w * 0.3, by - h * 0.82); ctx.lineTo(cx - w * 0.62, by - h * 0.62);
+      ctx.moveTo(cx + w * 0.3, by - h * 0.82); ctx.lineTo(cx + w * 0.62, by - h * 0.62);
+      ctx.stroke();
+      // head + hair
+      ctx.fillStyle = '#e6b07f';
+      ctx.beginPath(); ctx.arc(cx, by - h - 3, 7, 0, 7); ctx.fill();
+      ctx.fillStyle = '#2b2320';
+      ctx.beginPath(); ctx.arc(cx, by - h - 4, 7, Math.PI, 2 * Math.PI); ctx.fill();
       ctx.restore();
-    } else if (o.type === 'whale') {
-      // whale dump: big whale sitting on the chart
-      const bx = sx(o.x), by = sy(o.y);
-      const w = o.w, h = o.h;
+    } else if (o.type === 'tackle') {
+      // sliding tackle — low, jump over
+      const bx = sx(o.x), by = sy(o.y), w = o.w, h = o.h;
       ctx.save();
-      ctx.shadowColor = '#3b82f6';
-      ctx.shadowBlur = 12;
-      ctx.fillStyle = '#2563eb';
-      // body (facing left)
+      ctx.lineCap = 'round';
+      // reclined body
+      ctx.fillStyle = '#1d4ed8';
       ctx.beginPath();
-      ctx.moveTo(bx + w * 0.02, by - h * 0.45);
-      ctx.quadraticCurveTo(bx + w * 0.05, by - h * 0.95, bx + w * 0.45, by - h * 0.92);
-      ctx.quadraticCurveTo(bx + w * 0.85, by - h * 0.88, bx + w * 0.92, by - h * 0.45);
-      ctx.quadraticCurveTo(bx + w * 0.94, by - h * 0.1, bx + w * 0.6, by);
-      ctx.lineTo(bx + w * 0.1, by);
-      ctx.quadraticCurveTo(bx - w * 0.02, by - h * 0.15, bx + w * 0.02, by - h * 0.45);
-      ctx.closePath();
+      ctx.ellipse(bx + w * 0.6, by - h * 0.45, w * 0.3, h * 0.45, 0, 0, 7);
       ctx.fill();
-      // tail fluke
+      // extended sliding leg + boot
+      ctx.strokeStyle = '#1d4ed8'; ctx.lineWidth = 6;
       ctx.beginPath();
-      ctx.moveTo(bx + w * 0.9, by - h * 0.5);
-      ctx.quadraticCurveTo(bx + w * 1.06, by - h * 0.85, bx + w * 1.02, by - h * 0.2);
-      ctx.quadraticCurveTo(bx + w * 0.96, by - h * 0.45, bx + w * 0.9, by - h * 0.32);
-      ctx.closePath();
+      ctx.moveTo(bx + w * 0.55, by - h * 0.4); ctx.lineTo(bx + w * 0.04, by - h * 0.18);
+      ctx.stroke();
+      ctx.fillStyle = '#111';
+      ctx.beginPath(); ctx.ellipse(bx + w * 0.03, by - h * 0.15, 7, 4, 0, 0, 7); ctx.fill();
+      // head
+      ctx.fillStyle = '#e6b07f';
+      ctx.beginPath(); ctx.arc(bx + w * 0.85, by - h * 0.55, 6, 0, 7); ctx.fill();
+      // motion streaks
+      ctx.strokeStyle = 'rgba(255,255,255,0.4)'; ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(bx + w * 0.95, by - h * 0.25); ctx.lineTo(bx + w * 1.18, by - h * 0.25);
+      ctx.moveTo(bx + w * 0.95, by - h * 0.5); ctx.lineTo(bx + w * 1.12, by - h * 0.5);
+      ctx.stroke();
+      ctx.restore();
+    } else if (o.type === 'keeper') {
+      // diving goalkeeper — big and wide, double jump
+      const bx = sx(o.x), by = sy(o.y), w = o.w, h = o.h;
+      ctx.save();
+      ctx.lineCap = 'round';
+      ctx.shadowColor = 'rgba(0,0,0,0.35)'; ctx.shadowBlur = 8;
+      ctx.fillStyle = '#22c55e';
+      ctx.beginPath();
+      ctx.ellipse(bx + w * 0.5, by - h * 0.45, w * 0.4, h * 0.4, 0, 0, 7);
       ctx.fill();
       ctx.shadowBlur = 0;
-      // belly
-      ctx.fillStyle = '#93c5fd';
+      // reaching arm + glove
+      ctx.strokeStyle = '#16a34a'; ctx.lineWidth = 7;
       ctx.beginPath();
-      ctx.ellipse(bx + w * 0.4, by - h * 0.12, w * 0.34, h * 0.14, 0, 0, Math.PI);
-      ctx.fill();
-      // eye
-      ctx.fillStyle = '#0b0f14';
-      ctx.beginPath(); ctx.arc(bx + w * 0.14, by - h * 0.5, 2.4, 0, 7); ctx.fill();
-      // spout
-      ctx.strokeStyle = '#7dd3fc'; ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(bx + w * 0.3, by - h * 0.92); ctx.lineTo(bx + w * 0.26, by - h * 1.18);
-      ctx.moveTo(bx + w * 0.3, by - h * 0.92); ctx.lineTo(bx + w * 0.36, by - h * 1.16);
+      ctx.moveTo(bx + w * 0.6, by - h * 0.55); ctx.lineTo(bx + w * 0.92, by - h * 0.98);
       ctx.stroke();
-      // SELL tag
-      ctx.fillStyle = '#dbeafe';
+      ctx.fillStyle = '#f3f4f6';
+      ctx.beginPath(); ctx.arc(bx + w * 0.95, by - h * 1.0, 8, 0, 7); ctx.fill();
+      // trailing legs
+      ctx.strokeStyle = '#15803d'; ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.moveTo(bx + w * 0.4, by - h * 0.4); ctx.lineTo(bx + w * 0.08, by - h * 0.22);
+      ctx.moveTo(bx + w * 0.42, by - h * 0.5); ctx.lineTo(bx + w * 0.12, by - h * 0.6);
+      ctx.stroke();
+      // head
+      ctx.fillStyle = '#e6b07f';
+      ctx.beginPath(); ctx.arc(bx + w * 0.72, by - h * 0.64, 7, 0, 7); ctx.fill();
+      ctx.fillStyle = '#052e16';
       ctx.font = '700 11px ui-monospace, Menlo, monospace';
       ctx.textAlign = 'center';
-      ctx.fillText('SELL', bx + w * 0.45, by - h * 0.38);
+      ctx.fillText('GK', bx + w * 0.48, by - h * 0.4);
       ctx.restore();
-    } else if (o.type === 'paper') {
-      // paper hands: two trembling paper-white hands floating at head height
+    } else if (o.type === 'offside') {
+      // linesman's offside flag — floats at jump height, stay grounded
       const cx = sx(o.x + o.w / 2), cy = sy(o.y + o.h / 2);
-      const tremor = Math.sin(performance.now() * 0.02 + o.x) * 2;
+      const wv = Math.sin(performance.now() * 0.006 + o.x) * 0.18;
       ctx.save();
-      ctx.fillStyle = '#f3f4f6';
-      ctx.strokeStyle = '#9ca3af';
-      ctx.lineWidth = 1.4;
-      for (const side of [-1, 1]) {
-        const hx = cx + side * o.w * 0.24 + (side > 0 ? tremor : -tremor);
-        const hy = cy + (side > 0 ? 2 : -2);
-        // palm
-        ctx.beginPath();
-        ctx.ellipse(hx, hy + 6, 9, 11, side * 0.2, 0, 7);
-        ctx.fill(); ctx.stroke();
-        // fingers
-        for (let f = -2; f <= 2; f++) {
-          ctx.beginPath();
-          ctx.ellipse(hx + f * 4.2, hy - 8 + Math.abs(f) * 1.6, 2.1, 6.5, f * 0.12, 0, 7);
-          ctx.fill(); ctx.stroke();
-        }
+      ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(cx - o.w * 0.3, cy + o.h * 0.55);
+      ctx.lineTo(cx - o.w * 0.3, cy - o.h * 0.6);
+      ctx.stroke();
+      ctx.save();
+      ctx.translate(cx - o.w * 0.3, cy - o.h * 0.55);
+      ctx.rotate(wv);
+      const fw = o.w * 0.62, fh = o.h * 0.7, cols = 4, rows = 3;
+      for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) {
+        ctx.fillStyle = (i + j) % 2 ? '#f8d000' : '#dc2626';
+        ctx.fillRect(i * fw / cols, j * fh / rows, fw / cols, fh / rows);
       }
-      ctx.fillStyle = '#6b7280';
-      ctx.font = '700 9px ui-monospace, Menlo, monospace';
+      ctx.restore();
+      ctx.fillStyle = '#f8d000';
+      ctx.font = '700 10px ui-monospace, Menlo, monospace';
       ctx.textAlign = 'center';
-      ctx.fillText('PAPER', cx, cy + o.h / 2 + 12);
+      ctx.fillText('OFFSIDE', cx + o.w * 0.05, cy + o.h * 0.55 + 12);
       ctx.restore();
     } else {
-      // FUD cloud
+      // red card — floats low, stay grounded
       const cx = sx(o.x + o.w / 2), cy = sy(o.y + o.h / 2);
+      const tilt = Math.sin(performance.now() * 0.004 + o.x) * 0.12;
       ctx.save();
-      ctx.globalAlpha = 0.92;
-      ctx.fillStyle = '#3f4b59';
+      ctx.translate(cx, cy);
+      ctx.rotate(tilt);
+      ctx.shadowColor = 'rgba(220,38,38,0.6)'; ctx.shadowBlur = 12;
+      ctx.fillStyle = '#dc2626';
+      const cw = o.w * 0.5, ch = o.h * 0.95;
       ctx.beginPath();
-      ctx.ellipse(cx, cy, o.w / 2, o.h / 2, 0, 0, 7);
-      ctx.ellipse(cx - o.w * 0.28, cy + 4, o.w * 0.26, o.h * 0.4, 0, 0, 7);
-      ctx.ellipse(cx + o.w * 0.28, cy + 3, o.w * 0.24, o.h * 0.38, 0, 0, 7);
+      if (ctx.roundRect) ctx.roundRect(-cw / 2, -ch / 2, cw, ch, 4);
+      else ctx.rect(-cw / 2, -ch / 2, cw, ch);
       ctx.fill();
-      ctx.fillStyle = '#aab7c4';
-      ctx.font = '700 12px ui-monospace, Menlo, monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText('FUD', cx, cy + 4);
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = '#7f1d1d'; ctx.lineWidth = 1.5; ctx.stroke();
       ctx.restore();
+      ctx.fillStyle = '#fca5a5';
+      ctx.font = '700 9px ui-monospace, Menlo, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('RED CARD', cx, cy + o.h * 0.6 + 6);
     }
   }
 }
@@ -1074,42 +1239,73 @@ function drawFlags() {
     ctx.restore();
   }
 
-  // start marker: "we are here ->"
+  // start marker: "kick off ->"
   if (cam.x < 600) {
     ctx.save();
     ctx.fillStyle = '#e8eef2';
     ctx.font = '700 16px ui-monospace, Menlo, monospace';
     ctx.textAlign = 'right';
-    ctx.fillText('we are here \u2192', sx(-40), sy(0) + 36);
+    ctx.fillText('kick off \u2192', sx(-40), sy(0) + 36);
     ctx.restore();
   }
 
-  // finish: "1b ->" + moon
+  // finish: the World Cup trophy
   if (cam.x + W > X_WIN - 900) {
     const spot = solidGroundAfter(X_WIN);
     ctx.save();
-    // moon
-    ctx.beginPath();
-    ctx.shadowColor = '#fef9c3';
-    ctx.shadowBlur = 40;
-    ctx.fillStyle = '#fef3c7';
-    ctx.arc(sx(X_WIN + 320), sy(spot.y + 380), 56, 0, 7);
-    ctx.fill();
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = '#e8eef2';
-    ctx.font = '800 30px ui-monospace, Menlo, monospace';
+    drawTrophy(sx(X_WIN + 70), sy(spot.y + 250), 130);
+    ctx.fillStyle = '#ffd166';
+    ctx.font = '800 26px ui-monospace, Menlo, monospace';
     ctx.textAlign = 'right';
-    ctx.fillText('1b \u2192', sx(X_WIN - 30), sy(spot.y + 140));
-    // finish line
-    ctx.strokeStyle = '#ffd166';
-    ctx.lineWidth = 4;
-    ctx.setLineDash([10, 8]);
-    ctx.beginPath();
-    ctx.moveTo(sx(X_WIN), sy(spot.y) + 10);
-    ctx.lineTo(sx(X_WIN), sy(spot.y + 300));
-    ctx.stroke();
+    ctx.fillText('THE FINAL \u2192', sx(X_WIN - 30), sy(spot.y + 150));
+    // checkered finish line
+    const fx = sx(X_WIN);
+    const top = sy(spot.y + 300), bot = sy(spot.y) + 10;
+    const cell = 14;
+    for (let yy = top, row = 0; yy < bot; yy += cell, row++) {
+      ctx.fillStyle = row % 2 ? '#0b0f14' : '#ffffff';
+      ctx.fillRect(fx - 5, yy, 5, cell);
+      ctx.fillStyle = row % 2 ? '#ffffff' : '#0b0f14';
+      ctx.fillRect(fx, yy, 5, cell);
+    }
     ctx.restore();
   }
+}
+
+// Glowing World Cup trophy. (cx, cy) = base center on screen, h = height.
+function drawTrophy(cx, cy, h) {
+  const w = h * 0.5;
+  ctx.save();
+  ctx.shadowColor = 'rgba(255, 209, 102, 0.8)';
+  ctx.shadowBlur = 35;
+  const grad = ctx.createLinearGradient(cx - w / 2, cy - h, cx + w / 2, cy);
+  grad.addColorStop(0, '#fff3c4');
+  grad.addColorStop(0.5, '#ffd166');
+  grad.addColorStop(1, '#c9971f');
+  ctx.fillStyle = grad;
+  // twisted base/stem
+  ctx.beginPath();
+  ctx.moveTo(cx - w * 0.18, cy);
+  ctx.quadraticCurveTo(cx - w * 0.05, cy - h * 0.35, cx - w * 0.12, cy - h * 0.55);
+  ctx.quadraticCurveTo(cx - w * 0.4, cy - h * 0.7, cx - w * 0.3, cy - h);
+  ctx.lineTo(cx + w * 0.3, cy - h);
+  ctx.quadraticCurveTo(cx + w * 0.4, cy - h * 0.7, cx + w * 0.12, cy - h * 0.55);
+  ctx.quadraticCurveTo(cx + w * 0.05, cy - h * 0.35, cx + w * 0.18, cy);
+  ctx.closePath();
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  // base plinth
+  ctx.fillStyle = '#1f2937';
+  ctx.fillRect(cx - w * 0.28, cy, w * 0.56, h * 0.07);
+  ctx.fillStyle = '#c9971f';
+  ctx.fillRect(cx - w * 0.22, cy - h * 0.04, w * 0.44, h * 0.05);
+  // globe at the top
+  ctx.fillStyle = '#ffe9a8';
+  ctx.beginPath(); ctx.ellipse(cx, cy - h * 1.02, w * 0.32, h * 0.16, 0, 0, 7); ctx.fill();
+  ctx.strokeStyle = 'rgba(120,90,10,0.5)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.ellipse(cx, cy - h * 1.02, w * 0.32, h * 0.16, 0, 0, 7); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(cx, cy - h * 1.02, w * 0.12, h * 0.16, 0, 0, 7); ctx.stroke();
+  ctx.restore();
 }
 
 function drawParticles() {
@@ -1138,9 +1334,11 @@ function drawGhosts() {
       drawGhostIndicator(g);
       continue;
     }
-    drawWojak(ctx, sx(g.dx), sy(g.dy), g.dx * 0.045, {
-      color: g.color, alpha: 0.55, dead: g.dead,
+    const gn = NATION_BY_CODE[g.country];
+    drawRunner(ctx, sx(g.dx), sy(g.dy), g.dx * 0.045, {
+      color: g.color, alpha: 0.6, dead: g.dead,
       airborne: false, name: g.name,
+      kit: kitFor(g.country), flag: gn ? gn.flag : '',
     });
   }
 }
@@ -1170,10 +1368,11 @@ function render() {
   drawFlags();
   drawGhosts();
   if (player.state !== 'idle') {
-    drawWojak(ctx, sx(player.x), sy(player.y), player.phase, {
-      color: '#e8eef2',
+    drawRunner(ctx, sx(player.x), sy(player.y), player.phase, {
+      color: '#ffffff',
       dead: player.state === 'dead',
       airborne: !player.grounded && player.state === 'run',
+      kit: kitFor(myCountry),
     });
   }
   drawParticles();
@@ -1226,14 +1425,17 @@ const net = (() => {
     document.getElementById('online-dot').classList.toggle('live', online);
   }
 
+  // Backend WebSocket relay (hosted on Render). The frontend is static on
+  // Vercel, which can't run a persistent WS server, so we point at Render.
+  const BACKEND_WS = 'wss://speedrun-99da.onrender.com';
+
   function connect() {
     if (!playerName) return;
-    const proto = location.protocol === 'https:' ? 'wss://' : 'ws://';
-    try { ws = new WebSocket(proto + location.host); } catch (e) { scheduleRetry(); return; }
+    try { ws = new WebSocket(BACKEND_WS); } catch (e) { scheduleRetry(); return; }
 
     ws.onopen = () => {
       retry = 1000;
-      ws.send(JSON.stringify({ t: 'join', name: playerName }));
+      ws.send(JSON.stringify({ t: 'join', name: playerName, country: myCountry }));
     };
     ws.onmessage = (e) => {
       let msg; try { msg = JSON.parse(e.data); } catch { return; }
@@ -1266,26 +1468,27 @@ const net = (() => {
       chat.receive(msg);
     } else if (msg.t === 'join') {
       addGhost(msg);
-      toast(msg.name + ' joined the run', 'good');
+      const jn = NATION_BY_CODE[msg.country];
+      toast((jn ? jn.flag + ' ' : '') + msg.name + ' joined the tournament', 'good');
     } else if (msg.t === 'leave') {
       ghosts.delete(msg.id);
     } else if (msg.t === 'state') {
       const g = ghosts.get(msg.id);
       if (!g) return;
-      g.x = msg.x; g.y = msg.y; g.mcap = msg.mcap;
+      g.x = msg.x; g.y = msg.y; g.prog = msg.prog;
       g.dead = msg.dead; g.won = msg.won;
       if (g.dx === undefined) { g.dx = g.x; g.dy = g.y; }
     } else if (msg.t === 'event') {
-      if (msg.kind === 'death') toast(msg.name + ' got rugged at ' + msg.label, 'bad');
-      else if (msg.kind === 'win') toast(msg.name + ' hit $1B in ' + msg.label + '! WAGMI', 'good');
+      if (msg.kind === 'death') toast(msg.name + ' was stopped in the ' + msg.label, 'bad');
+      else if (msg.kind === 'win') toast(msg.name + ' lifted the Trophy in ' + msg.label + '!', 'good');
     }
   }
 
   function addGhost(p) {
     ghosts.set(p.id, {
-      name: p.name, color: p.color,
+      name: p.name, color: p.color, country: p.country || '',
       x: p.x || 0, y: p.y || 0, dx: undefined, dy: undefined,
-      mcap: p.mcap || 0, dead: !!p.dead, won: !!p.won,
+      prog: p.prog || 0, dead: !!p.dead, won: !!p.won,
     });
   }
 
@@ -1296,7 +1499,7 @@ const net = (() => {
       ws.send(JSON.stringify({
         t: 'state',
         x: Math.round(player.x), y: Math.round(player.y),
-        mcap: Math.round(mcapAt(player.x)),
+        prog: Math.round(player.x),
         dead: player.state === 'dead',
         won: player.state === 'won',
       }));
@@ -1423,22 +1626,29 @@ function toast(text, cls) {
 
 let lbTimer = 0;
 function updateHUD(dt) {
-  elMcap.textContent = fmtMcap(mcapAt(player.x));
+  elMcap.textContent = stageAt(player.x);
   elTimer.textContent = fmtTime(player.runTime);
-  elCpLabel.textContent = player.checkpointIdx >= 0
-    ? 'checkpoint: ' + CHECKPOINTS[player.checkpointIdx].label
-    : 'no checkpoint';
+  const nextCpIdx = player.checkpointIdx + 1;
+  if (nextCpIdx < CHECKPOINTS.length) {
+    const left = Math.max(0, Math.round((CHECKPOINTS[nextCpIdx].x - player.x) * METERS_PER_UNIT));
+    elCpLabel.textContent = left + 'm to ' + CHECKPOINTS[nextCpIdx].label;
+  } else {
+    const left = Math.max(0, Math.round((X_WIN - player.x) * METERS_PER_UNIT));
+    elCpLabel.textContent = left > 0 ? left + 'm to the TROPHY' : 'lift the trophy!';
+  }
   if (player.runTime > 8 && elHint.style.opacity !== '0') elHint.style.opacity = '0';
 
   lbTimer -= dt;
   if (lbTimer > 0) return;
   lbTimer = 0.25;
 
-  const entries = [{ name: playerName + ' (you)', mcap: mcapAt(player.x), color: '#e8eef2', me: true, won: player.state === 'won' }];
+  const myNation = NATION_BY_CODE[myCountry];
+  const entries = [{ name: playerName + ' (you)', flag: myNation ? myNation.flag : '', prog: player.x, color: '#ffffff', me: true, won: player.state === 'won' }];
   for (const g of ghosts.values()) {
-    entries.push({ name: g.name, mcap: g.mcap, color: g.color, me: false, won: g.won });
+    const gn = NATION_BY_CODE[g.country];
+    entries.push({ name: g.name, flag: gn ? gn.flag : '', prog: g.prog, color: g.color, me: false, won: g.won });
   }
-  entries.sort((a, b) => b.mcap - a.mcap);
+  entries.sort((a, b) => b.prog - a.prog);
 
   const total = ghosts.size + 1;
   elOnlineText.textContent = total + ' runner' + (total === 1 ? '' : 's') + ' online';
@@ -1446,9 +1656,10 @@ function updateHUD(dt) {
   let html = '';
   for (let i = 0; i < Math.min(entries.length, 6); i++) {
     const e = entries[i];
+    const pct = Math.min(100, Math.round((e.prog / X_WIN) * 100));
     html += '<div class="lb-row' + (e.me ? ' me' : '') + '">'
-      + '<span class="lb-name" style="color:' + e.color + '">' + (i + 1) + '. ' + escapeHtml(e.name) + (e.won ? ' [1B]' : '') + '</span>'
-      + '<span class="lb-mcap">' + fmtMcap(e.mcap) + '</span></div>';
+      + '<span class="lb-name" style="color:' + e.color + '">' + (i + 1) + '. ' + (e.flag ? e.flag + ' ' : '') + escapeHtml(e.name) + (e.won ? ' [CHAMP]' : '') + '</span>'
+      + '<span class="lb-mcap">' + pct + '%</span></div>';
   }
   elLeaderboard.innerHTML = html;
 }
@@ -1458,6 +1669,33 @@ function escapeHtml(s) {
 
 // ---------- input ----------
 let playerName = '';
+let myCountry = '';
+let walletAddress = '';
+
+// Basic Solana public-key sanity check: base58, 32–44 chars (no 0 O I l).
+function isValidSolanaAddress(addr) {
+  return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(addr);
+}
+
+// ---------- country picker ----------
+(function buildCountryPicker() {
+  const grid = document.getElementById('country-grid');
+  if (!grid) return;
+  myCountry = localStorage.getItem('wc-country') || '';
+  function select(code) {
+    myCountry = code;
+    localStorage.setItem('wc-country', code);
+    for (const tile of grid.children) tile.classList.toggle('selected', tile.dataset.code === code);
+  }
+  for (const n of NATIONS) {
+    const tile = document.createElement('div');
+    tile.className = 'country-tile' + (n.code === myCountry ? ' selected' : '');
+    tile.dataset.code = n.code;
+    tile.innerHTML = '<div class="flag">' + n.flag + '</div><div class="cname">' + n.name + '</div>';
+    tile.addEventListener('click', () => select(n.code));
+    grid.appendChild(tile);
+  }
+})();
 
 window.addEventListener('keydown', (e) => {
   if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
@@ -1485,6 +1723,30 @@ function beginGame() {
     input.focus();
     return;
   }
+  if (!myCountry) {
+    const label = document.getElementById('country-label');
+    if (label) {
+      label.textContent = 'PICK YOUR NATION FIRST';
+      label.style.color = '#fda4af';
+    }
+    document.getElementById('country-grid').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    return;
+  }
+  const walletEl = document.getElementById('wallet-input');
+  const walletLabel = document.getElementById('wallet-label');
+  walletAddress = walletEl.value.trim();
+  if (!isValidSolanaAddress(walletAddress)) {
+    walletEl.classList.add('invalid');
+    walletEl.focus();
+    if (walletLabel) {
+      walletLabel.textContent = walletAddress
+        ? "THAT DOESN'T LOOK LIKE A SOLANA ADDRESS"
+        : 'ENTER YOUR SOLANA WALLET ADDRESS FIRST';
+      walletLabel.style.color = '#fda4af';
+    }
+    return;
+  }
+  localStorage.setItem('wc-wallet', walletAddress);
   localStorage.setItem('speedrun-name', playerName);
   document.getElementById('title-screen').classList.remove('visible');
   document.getElementById('hud').classList.add('visible');
@@ -1496,53 +1758,30 @@ function beginGame() {
   net.startStateLoop();
 }
 document.getElementById('name-input').value = localStorage.getItem('speedrun-name') || '';
-
-// ---------- contract address (click to copy) ----------
-const CONTRACT_ADDR = 'uQrjYjA456qSxh2KmUw1zMjoeVJRYGdW41vukxupump';
-const contractBox = document.getElementById('contract-box');
-const contractCopyEl = document.getElementById('contract-copy');
-let copyTimer = null;
-
-function copyToClipboard(text) {
-  // Textarea fallback first — works on HTTP, Safari, mobile (Clipboard API often blocked).
-  const ta = document.createElement('textarea');
-  ta.value = text;
-  ta.setAttribute('readonly', '');
-  ta.style.cssText = 'position:fixed;top:0;left:0;width:2px;height:2px;padding:0;border:none;outline:none;box-shadow:none;background:transparent';
-  document.body.appendChild(ta);
-  ta.focus();
-  ta.select();
-  ta.setSelectionRange(0, text.length);
-  let ok = false;
-  try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
-  document.body.removeChild(ta);
-  if (ok) return Promise.resolve();
-  if (navigator.clipboard && window.isSecureContext) {
-    return navigator.clipboard.writeText(text);
-  }
-  return Promise.reject(new Error('copy failed'));
-}
-
-function showCopied() {
-  contractBox.classList.add('copied');
-  contractCopyEl.textContent = 'copied!';
-  clearTimeout(copyTimer);
-  copyTimer = setTimeout(() => {
-    contractBox.classList.remove('copied');
-    contractCopyEl.textContent = 'click to copy';
-  }, 1600);
-}
-
-contractBox.addEventListener('pointerdown', (e) => {
-  e.preventDefault();
-  e.stopPropagation();
+document.getElementById('wallet-input').value = localStorage.getItem('wc-wallet') || '';
+document.getElementById('wallet-input').addEventListener('input', (e) => {
+  e.target.classList.remove('invalid');
+  const label = document.getElementById('wallet-label');
+  if (label) { label.textContent = 'YOUR SOLANA WALLET ADDRESS'; label.style.color = ''; }
 });
-contractBox.addEventListener('click', (e) => {
-  e.preventDefault();
-  e.stopPropagation();
-  copyToClipboard(CONTRACT_ADDR).then(showCopied).catch(() => {
-    contractCopyEl.textContent = 'copy failed — select address manually';
-  });
+
+// Copy the reward wallet address from the win screen.
+document.getElementById('win-wallet-copy').addEventListener('click', () => {
+  const btn = document.getElementById('win-wallet-copy');
+  const done = () => { btn.textContent = 'copied'; setTimeout(() => { btn.textContent = 'copy'; }, 1500); };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(walletAddress).then(done).catch(() => {
+      const r = document.createRange();
+      r.selectNodeContents(document.getElementById('win-wallet-addr'));
+      const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      try { document.execCommand('copy'); done(); } catch (e) {}
+    });
+  } else {
+    const r = document.createRange();
+    r.selectNodeContents(document.getElementById('win-wallet-addr'));
+    const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+    try { document.execCommand('copy'); done(); } catch (e) {}
+  }
 });
 
 // ---------- main loop ----------
