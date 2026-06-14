@@ -302,6 +302,37 @@
     border-radius: 5px; padding: 2px 8px; font: inherit; font-size: 11px;
   }
 
+  /* ---------- spectate (admin) bar ---------- */
+  #spectate-bar {
+    position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
+    z-index: 11; display: none; align-items: center; gap: 14px;
+    background: var(--panel); border: 1px solid rgba(74, 222, 128, 0.4);
+    border-radius: 12px; padding: 10px 14px;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  }
+  body.spectating #spectate-bar { display: flex; }
+  #spectate-bar button {
+    cursor: pointer; pointer-events: auto;
+    background: transparent; border: 1px solid #2a3a4a; border-radius: 8px;
+    color: var(--text); font: inherit; font-size: 13px; font-weight: 700;
+    letter-spacing: 1px; padding: 9px 14px; white-space: nowrap;
+    transition: border-color 0.12s, color 0.12s, background 0.12s;
+  }
+  #spectate-bar button:hover { border-color: var(--green); color: var(--green-bright); background: rgba(46, 204, 113, 0.08); }
+  #spectate-bar button:active { transform: translateY(1px); }
+  #spec-info { text-align: center; min-width: 200px; }
+  #spec-label { font-size: 10px; letter-spacing: 3px; color: var(--green-bright); }
+  #spec-name { font-size: 16px; font-weight: 700; color: var(--text); margin: 2px 0; }
+  #spec-meta { font-size: 11px; color: var(--dim); letter-spacing: 1px; }
+
+  /* keep the stream clean: hide the single-player HUD chrome while spectating */
+  body.spectating #mcap-box,
+  body.spectating #timer-box,
+  body.spectating #hint,
+  body.spectating #chat-nick,
+  body.spectating #chat-form { display: none; }
+
   #win-time { font-size: 40px; font-weight: 800; color: #ffd166; margin: 8px 0 4px; }
   #win-sub { color: var(--dim); font-size: 13px; margin-bottom: 28px; }
   .win-title {
@@ -345,6 +376,16 @@
       <button id="chat-send" type="submit">send</button>
     </form>
   </div>
+</div>
+
+<div id="spectate-bar">
+  <button id="spec-prev" type="button" title="previous runner (←)">&#9664; PREV</button>
+  <div id="spec-info">
+    <div id="spec-label">SPECTATING</div>
+    <div id="spec-name">waiting for runners…</div>
+    <div id="spec-meta"></div>
+  </div>
+  <button id="spec-next" type="button" title="next runner (→)">NEXT &#9654;</button>
 </div>
 
 <div id="title-screen" class="overlay visible">
@@ -392,6 +433,13 @@
 //  Pick a nation, run the pitch, dodge defenders, lift the Trophy.
 //  World coordinates: x grows right, y grows UP.
 // =====================================================================
+
+// ---------- spectate (admin) ----------
+// Open https://<domain>/?spectate=SECRET to watch runners without joining.
+// NOTE: client-side gate only — change SPECTATE_SECRET before deploying.
+const SPECTATE_SECRET = 'wc-admin-9Fk3Qz7Rm2Tx';
+const isSpectator = new URLSearchParams(location.search).get('spectate') === SPECTATE_SECRET;
+let spectateId = null; // id of the runner currently being watched
 
 // ---------- nations (curated 2026 contenders) ----------
 // jersey/shorts/socks/boots are kit colors used to draw the stickman.
@@ -795,8 +843,19 @@ function updatePlayer(dt) {
 // ---------- camera ----------
 const cam = { x: 0, y: 0 };
 function updateCamera(dt) {
-  const tx = player.x - W * 0.32;
-  const ty = (player.grounded ? player.y : player.lastGroundY) - H * 0.45;
+  let tx, ty;
+  if (isSpectator) {
+    const t = spectateTarget();
+    if (t && t.dx !== undefined) {
+      tx = t.dx - W * 0.32;
+      ty = t.dy - H * 0.45;
+    } else {
+      tx = cam.x; ty = cam.y; // no runner yet: hold position
+    }
+  } else {
+    tx = player.x - W * 0.32;
+    ty = (player.grounded ? player.y : player.lastGroundY) - H * 0.45;
+  }
   cam.x = lerp(cam.x, tx, 1 - Math.exp(-8 * dt));
   cam.y = lerp(cam.y, ty, 1 - Math.exp(-3.2 * dt));
 }
@@ -1328,19 +1387,36 @@ function drawParticles() {
 }
 
 function drawGhosts() {
-  for (const g of ghosts.values()) {
+  for (const [gid, g] of ghosts) {
     if (g.dx === undefined) continue;
     if (g.dx < cam.x - 150 || g.dx > cam.x + W + 150) {
       drawGhostIndicator(g);
       continue;
     }
     const gn = NATION_BY_CODE[g.country];
+    // While spectating, the watched runner is shown solid + highlighted;
+    // everyone else stays as a translucent ghost.
+    const watched = isSpectator && gid === spectateId;
+    if (watched) drawSpectateHighlight(sx(g.dx), sy(g.dy));
     drawRunner(ctx, sx(g.dx), sy(g.dy), g.dx * 0.045, {
-      color: g.color, alpha: 0.6, dead: g.dead,
+      color: g.color, alpha: watched ? 1 : 0.6, dead: g.dead,
       airborne: false, name: g.name,
       kit: kitFor(g.country), flag: gn ? gn.flag : '',
     });
   }
+}
+
+// Glowing ring under the runner the admin is currently watching.
+function drawSpectateHighlight(x, y) {
+  ctx.save();
+  ctx.strokeStyle = 'rgba(74, 222, 128, 0.9)';
+  ctx.lineWidth = 3;
+  ctx.shadowColor = 'rgba(74, 222, 128, 0.8)';
+  ctx.shadowBlur = 16;
+  ctx.beginPath();
+  ctx.ellipse(x, y + 2, 26, 9, 0, 0, 7);
+  ctx.stroke();
+  ctx.restore();
 }
 
 // Off-screen ghosts: small arrow at screen edge so you know who's ahead/behind
@@ -1367,7 +1443,7 @@ function render() {
   drawObstacles();
   drawFlags();
   drawGhosts();
-  if (player.state !== 'idle') {
+  if (!isSpectator && player.state !== 'idle') {
     drawRunner(ctx, sx(player.x), sy(player.y), player.phase, {
       color: '#ffffff',
       dead: player.state === 'dead',
@@ -1420,6 +1496,7 @@ const net = (() => {
   let joined = false;
   let retry = 1000;
   let stateTimer = null;
+  let asSpectator = false;
 
   function setStatus(online) {
     document.getElementById('online-dot').classList.toggle('live', online);
@@ -1430,12 +1507,13 @@ const net = (() => {
   const BACKEND_WS = 'wss://speedrun-99da.onrender.com';
 
   function connect() {
-    if (!playerName) return;
+    if (!playerName && !asSpectator) return;
     try { ws = new WebSocket(BACKEND_WS); } catch (e) { scheduleRetry(); return; }
 
     ws.onopen = () => {
       retry = 1000;
-      ws.send(JSON.stringify({ t: 'join', name: playerName, country: myCountry }));
+      if (asSpectator) ws.send(JSON.stringify({ t: 'spectate' }));
+      else ws.send(JSON.stringify({ t: 'join', name: playerName, country: myCountry }));
     };
     ws.onmessage = (e) => {
       let msg; try { msg = JSON.parse(e.data); } catch { return; }
@@ -1460,18 +1538,26 @@ const net = (() => {
       joined = true;
       myId = msg.id;
       setStatus(true);
-      chat.setNick(playerName);
-      chat.system('connected — chatting as ' + playerName);
+      if (asSpectator) {
+        chat.setNick('spectating');
+        chat.system('spectating — pick a runner with ← / →');
+      } else {
+        chat.setNick(playerName);
+        chat.system('connected — chatting as ' + playerName);
+      }
       ghosts.clear();
       for (const p of msg.players) addGhost(p);
+      if (asSpectator) spectateEnsureTarget();
     } else if (msg.t === 'chat') {
       chat.receive(msg);
     } else if (msg.t === 'join') {
       addGhost(msg);
       const jn = NATION_BY_CODE[msg.country];
       toast((jn ? jn.flag + ' ' : '') + msg.name + ' joined the tournament', 'good');
+      if (asSpectator) spectateEnsureTarget();
     } else if (msg.t === 'leave') {
       ghosts.delete(msg.id);
+      if (asSpectator && msg.id === spectateId) spectateFallback();
     } else if (msg.t === 'state') {
       const g = ghosts.get(msg.id);
       if (!g) return;
@@ -1517,8 +1603,41 @@ const net = (() => {
     return true;
   }
 
-  return { connect, startStateLoop, sendEvent, sendChat };
+  // Connect as an invisible watcher: same socket/handlers, but sends
+  // {t:'spectate'} instead of {t:'join'} so the server never lists us.
+  function spectate() {
+    asSpectator = true;
+    setStatus(false);
+    connect();
+  }
+
+  return { connect, startStateLoop, sendEvent, sendChat, spectate };
 })();
+
+// ---------- spectate target selection ----------
+function spectateTarget() { return spectateId != null ? ghosts.get(spectateId) : null; }
+// Stable order (by join id) so next/prev is predictable while streaming.
+function spectateList() { return Array.from(ghosts.keys()).sort((a, b) => a - b); }
+function spectateEnsureTarget() {
+  if (spectateId == null || !ghosts.has(spectateId)) {
+    const list = spectateList();
+    spectateId = list.length ? list[0] : null;
+  }
+  updateSpectateBar();
+}
+function spectateFallback() {
+  const list = spectateList();
+  spectateId = list.length ? list[0] : null;
+  updateSpectateBar();
+}
+function spectateCycle(dir) {
+  const list = spectateList();
+  if (!list.length) { spectateId = null; updateSpectateBar(); return; }
+  let i = list.indexOf(spectateId);
+  i = i === -1 ? 0 : (i + dir + list.length) % list.length;
+  spectateId = list[i];
+  updateSpectateBar();
+}
 
 // ---------- live chat ----------
 // Docked in the bottom-left corner so it never overlaps the run.
@@ -1626,6 +1745,7 @@ function toast(text, cls) {
 
 let lbTimer = 0;
 function updateHUD(dt) {
+  if (isSpectator) { updateSpectateHUD(dt); return; }
   elMcap.textContent = stageAt(player.x);
   elTimer.textContent = fmtTime(player.runTime);
   const nextCpIdx = player.checkpointIdx + 1;
@@ -1663,6 +1783,52 @@ function updateHUD(dt) {
   }
   elLeaderboard.innerHTML = html;
 }
+
+// Spectator HUD: runners-only leaderboard (no "you"), watched runner marked.
+let specLbTimer = 0;
+function updateSpectateHUD(dt) {
+  specLbTimer -= dt;
+  if (specLbTimer > 0) return;
+  specLbTimer = 0.25;
+
+  const total = ghosts.size;
+  elOnlineText.textContent = total + ' runner' + (total === 1 ? '' : 's') + ' online';
+
+  const entries = [];
+  for (const [gid, g] of ghosts) {
+    const gn = NATION_BY_CODE[g.country];
+    entries.push({ id: gid, name: g.name, flag: gn ? gn.flag : '', prog: g.prog, color: g.color, won: g.won });
+  }
+  entries.sort((a, b) => b.prog - a.prog);
+
+  let html = '';
+  for (let i = 0; i < Math.min(entries.length, 8); i++) {
+    const e = entries[i];
+    const pct = Math.min(100, Math.round((e.prog / X_WIN) * 100));
+    html += '<div class="lb-row' + (e.id === spectateId ? ' me' : '') + '">'
+      + '<span class="lb-name" style="color:' + e.color + '">' + (i + 1) + '. ' + (e.flag ? e.flag + ' ' : '') + escapeHtml(e.name) + (e.won ? ' [CHAMP]' : '') + '</span>'
+      + '<span class="lb-mcap">' + pct + '%</span></div>';
+  }
+  elLeaderboard.innerHTML = html || '<div class="lb-row"><span class="lb-name">no runners yet</span></div>';
+}
+
+// Refresh the bottom spectate banner (name, nation, stage, progress).
+function updateSpectateBar() {
+  const nameEl = document.getElementById('spec-name');
+  const metaEl = document.getElementById('spec-meta');
+  if (!nameEl || !metaEl) return;
+  const g = spectateTarget();
+  if (!g) {
+    nameEl.textContent = 'waiting for runners…';
+    metaEl.textContent = '';
+    return;
+  }
+  const gn = NATION_BY_CODE[g.country];
+  const pct = Math.min(100, Math.round((g.prog / X_WIN) * 100));
+  nameEl.innerHTML = (gn ? gn.flag + ' ' : '') + escapeHtml(g.name) + (g.won ? ' [CHAMP]' : g.dead ? ' (down)' : '');
+  metaEl.textContent = stageAt(g.prog) + ' · ' + pct + '%';
+}
+
 function escapeHtml(s) {
   return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
@@ -1698,6 +1864,11 @@ function isValidSolanaAddress(addr) {
 })();
 
 window.addEventListener('keydown', (e) => {
+  if (isSpectator && (e.code === 'ArrowLeft' || e.code === 'ArrowRight')) {
+    e.preventDefault();
+    spectateCycle(e.code === 'ArrowRight' ? 1 : -1);
+    return;
+  }
   if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
     const ae = document.activeElement;
     if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA')) return;
@@ -1708,7 +1879,7 @@ window.addEventListener('keydown', (e) => {
     beginGame();
   }
 });
-canvas.addEventListener('pointerdown', (e) => { e.preventDefault(); jump(); });
+canvas.addEventListener('pointerdown', (e) => { if (isSpectator) return; e.preventDefault(); jump(); });
 
 document.getElementById('start-btn').addEventListener('click', beginGame);
 document.getElementById('restart-btn').addEventListener('click', () => {
@@ -1794,12 +1965,19 @@ function frame(now) {
   lastT = now;
   dt = Math.min(dt, 0.1);
 
-  acc += dt;
-  let steps = 0;
-  while (acc >= STEP && steps < 12) {
-    updatePlayer(STEP);
-    acc -= STEP;
-    steps++;
+  if (isSpectator) {
+    // No local avatar to simulate; just keep the world generated ahead of
+    // whoever we're watching so terrain/obstacles render around them.
+    const t = spectateTarget();
+    if (t && t.dx !== undefined) genTo(t.dx + W * 1.5);
+  } else {
+    acc += dt;
+    let steps = 0;
+    while (acc >= STEP && steps < 12) {
+      updatePlayer(STEP);
+      acc -= STEP;
+      steps++;
+    }
   }
   updateCamera(dt);
   updateGhosts(dt);
@@ -1808,6 +1986,19 @@ function frame(now) {
   if (document.getElementById('hud').classList.contains('visible')) updateHUD(dt);
 
   requestAnimationFrame(frame);
+}
+
+// ---------- spectate (admin) startup ----------
+// When opened via ?spectate=SECRET, skip the join flow and watch instead.
+if (isSpectator) {
+  document.body.classList.add('spectating');
+  document.getElementById('title-screen').classList.remove('visible');
+  document.getElementById('hud').classList.add('visible');
+  document.getElementById('spec-prev').addEventListener('click', () => spectateCycle(-1));
+  document.getElementById('spec-next').addEventListener('click', () => spectateCycle(1));
+  updateSpectateBar();
+  chat.show(); // read-only: compose form is hidden via CSS
+  net.spectate();
 }
 
 genTo(W * 2);

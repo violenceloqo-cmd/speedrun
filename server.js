@@ -54,6 +54,7 @@ const COLORS = [
 
 let nextId = 1;
 const players = new Map(); // id -> { ws, name, color, state }
+const spectators = new Set(); // invisible admin watchers (not in the roster)
 
 function send(ws, obj) {
   if (ws.readyState === ws.OPEN) ws.send(JSON.stringify(obj));
@@ -63,6 +64,10 @@ function broadcast(obj, exceptId) {
   const raw = JSON.stringify(obj);
   for (const [pid, p] of players) {
     if (pid !== exceptId && p.ws.readyState === p.ws.OPEN) p.ws.send(raw);
+  }
+  // Spectators see everything but never count as players.
+  for (const sws of spectators) {
+    if (sws.readyState === sws.OPEN) sws.send(raw);
   }
 }
 
@@ -90,7 +95,14 @@ wss.on('connection', (ws, req) => {
     let msg;
     try { msg = JSON.parse(raw); } catch { return; }
 
-    if (msg.t === 'join' && id === null) {
+    if (msg.t === 'spectate' && id === null && !ws.isSpectator) {
+      // Invisible watcher: gets the roster + live broadcasts but is never
+      // added to the players map, so it doesn't show up for runners.
+      ws.isSpectator = true;
+      spectators.add(ws);
+      send(ws, { t: 'welcome', id: 0, spectator: true, players: rosterFor(null) });
+      console.log(`[*] spectator connected (${spectators.size} watching)`);
+    } else if (msg.t === 'join' && id === null && !ws.isSpectator) {
       id = nextId++;
       const name = String(msg.name || '').trim().slice(0, 16) || 'anon';
       const country = String(msg.country || '').trim().slice(0, 4);
@@ -131,6 +143,7 @@ wss.on('connection', (ws, req) => {
   });
 
   ws.on('close', () => {
+    spectators.delete(ws);
     if (id !== null && players.has(id)) {
       const name = players.get(id).name;
       players.delete(id);
