@@ -82,6 +82,17 @@
     padding: 8px 12px; min-width: 170px; max-width: 230px;
   }
   #online-count { font-size: 11px; color: var(--dim); letter-spacing: 1px; margin-bottom: 6px; }
+  #contract-ca {
+    pointer-events: auto; cursor: pointer;
+    display: inline-block; margin-left: 8px; vertical-align: 1px;
+    background: rgba(255, 209, 102, 0.08);
+    border: 1px solid rgba(255, 209, 102, 0.45); border-radius: 999px;
+    padding: 2px 9px; font-size: 10px; letter-spacing: 0.5px;
+    color: var(--gold); white-space: nowrap;
+    transition: border-color 0.12s, color 0.12s, background 0.12s;
+  }
+  #contract-ca:hover { border-color: var(--gold); background: rgba(255, 209, 102, 0.16); }
+  #contract-ca.copied { color: var(--green-bright); border-color: var(--green); background: rgba(46, 204, 113, 0.12); }
   #online-dot {
     display: inline-block; width: 7px; height: 7px; border-radius: 50%;
     background: #475569; margin-right: 5px; vertical-align: 1px;
@@ -346,7 +357,10 @@
 
 <div id="hud">
   <div id="players-box">
-    <div id="online-count"><span id="online-dot"></span><span id="online-text">offline</span></div>
+    <div id="online-count">
+      <span id="online-dot"></span><span id="online-text">offline</span>
+      <span id="contract-ca" title="click to copy contract address">CA: 2YaV7U…Lpump</span>
+    </div>
     <div id="leaderboard"></div>
   </div>
   <div id="mcap-box">
@@ -1085,15 +1099,6 @@ function drawBackground() {
     ctx.fillStyle = band % 2 ? 'rgba(255,255,255,0.018)' : 'rgba(0,0,0,0.05)';
     ctx.fillRect(sx(gx), 0, stripe, H);
   }
-  ctx.restore();
-
-  // watermark
-  ctx.save();
-  ctx.globalAlpha = 0.04;
-  ctx.font = '800 ' + Math.min(120, W * 0.11) + 'px ui-monospace, Menlo, monospace';
-  ctx.textAlign = 'center';
-  ctx.fillStyle = '#ffffff';
-  ctx.fillText('ROAD TO GLORY', W / 2, H * 0.5);
   ctx.restore();
 }
 
@@ -1935,6 +1940,28 @@ document.getElementById('wallet-input').addEventListener('input', (e) => {
   const label = document.getElementById('wallet-label');
   if (label) { label.textContent = 'YOUR SOLANA WALLET ADDRESS'; label.style.color = ''; }
 });
+
+// Click-to-copy the token contract address shown by the online counter.
+const CONTRACT_ADDRESS = '2YaV7U9zR196YUq4nj2dTVdmHUXajs3kNVxyfgfLpump';
+(function setupContractCopy() {
+  const el = document.getElementById('contract-ca');
+  if (!el) return;
+  el.addEventListener('click', () => {
+    const flash = () => {
+      el.classList.add('copied');
+      const prev = el.textContent;
+      el.textContent = 'copied!';
+      setTimeout(() => { el.textContent = prev; el.classList.remove('copied'); }, 1400);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(CONTRACT_ADDRESS).then(flash).catch(() => {
+        prompt('Copy the contract address:', CONTRACT_ADDRESS);
+      });
+    } else {
+      prompt('Copy the contract address:', CONTRACT_ADDRESS);
+    }
+  });
+})();
 
 // Copy the reward wallet address from the win screen.
 document.getElementById('win-wallet-copy').addEventListener('click', () => {
