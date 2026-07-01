@@ -1,6 +1,6 @@
-# WORLD CUP RUN — Footballer Stickman Runner
+# BULLRUN — Charging-Bull Runner
 
-A multiplayer auto-runner themed around the 2026 World Cup. Pick your nation, run as a stickman footballer in that country's kit (jersey, shorts, socks, boots), dodge defenders and the keeper, stay onside — and race every other connected player live to **lift the World Cup Trophy**.
+A multiplayer auto-runner themed around a crypto bull market. Rep your country, charge the chart as a galloping bull, dodge bears, whales, dumps and FUD — and race every other connected player live to a **$100B market cap**.
 
 ## Run it
 
@@ -17,25 +17,25 @@ Open **http://localhost:3000** — open it in multiple tabs (or share your LAN a
 | --- | --- |
 | `SPACE` / `W` / `↑` / tap / click | Jump (press again mid-air to double jump) |
 
-- On the title screen, enter a name and **pick your nation** from the 16 contenders.
-- Progress is your run along the pitch: **Group Stage → Round of 16 → Quarter-Final → Semi-Final → Final**.
-- **First player to lift the Trophy wins 5 SOL.**
-- **Stage flags** at Round of 16, Quarter-Final, Semi-Final and Final — get stopped and you respawn at the last flag.
-- **Defenders**: hurdle over them.
-- **Sliding tackles**: low to the ground — jump over.
-- **Diving keeper**: big and wide — clear it with a double jump.
-- **Touchlines**: gaps in the pitch — jump across or the ball goes out of play.
-- **Offside flags** and **red cards**: float at jump height — stay grounded to pass under.
-- The run timer never stops; the hook is beating your best time to the Trophy.
+- On the title screen, enter a name and **rep your country** from the 16 options.
+- Progress is your charge up the chart: **Launch → $1B → $10B → $50B → $90B → $100B**.
+- **First player to hit $100B wins 5 SOL.**
+- **Milestone flags** at $1B, $10B, $50B and $90B — get rekt and you respawn at the last flag.
+- **Bears**: hurdle over them.
+- **Dumps**: low to the ground — jump over.
+- **Whales**: big and wide — clear them with a double jump.
+- **Rug pulls**: gaps in the chart — jump across or you get liquidated.
+- **FUD** and **rugs**: float at jump height — stay grounded to pass under.
+- The run timer never stops; the hook is beating your best time to $100B.
 
 ## Multiplayer
 
-- The pitch is generated from a fixed seed, so everyone runs the exact same course.
-- Other players appear as semi-transparent footballers in their nation's kit with name + flag tags (no collision — pure race).
-- Live leaderboard sorted by progress with flags, plus toasts when someone joins, is stopped, or lifts the Trophy.
+- The chart is generated from a fixed seed, so everyone runs the exact same course.
+- Other players appear as semi-transparent bulls with a colored aura and name + flag tags (no collision — pure race).
+- Live leaderboard sorted by progress with flags, plus toasts when someone joins, gets rekt, or hits $100B.
 - The game stays fully playable solo if the connection drops (auto-reconnects).
 
-## Nations
+## Countries
 
 Brazil, Argentina, France, England, Spain, Germany, Portugal, Netherlands, USA, Mexico, Canada, Japan, Belgium, Croatia, Morocco, Uruguay.
 

@@ -40,12 +40,20 @@ const server = http.createServer((req, res) => {
 
 const wss = new WebSocketServer({ server });
 
-// Only accept WebSocket connections from the deployed frontend (and any
-// extra origins listed in ALLOWED_ORIGINS, comma-separated). An empty
-// allowlist disables the check (useful for quick local testing).
-const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ||
-  'https://worldcuprun.fun,https://www.worldcuprun.fun')
+// Origin policy: by default we accept connections from ANY origin so that
+// multiplayer "just works" no matter which domain serves the frontend
+// (apex, www, *.vercel.app previews, localhost, etc.). All player positions
+// are already public, so this is not a security boundary. To lock it down,
+// set ALLOWED_ORIGINS to a comma-separated list; localhost is always allowed.
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || '')
   .split(',').map((s) => s.trim()).filter(Boolean);
+
+function originAllowed(origin) {
+  if (ALLOWED_ORIGINS.length === 0) return true; // allow all by default
+  if (!origin) return true;
+  if (ALLOWED_ORIGINS.includes(origin)) return true;
+  return /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/.test(origin);
+}
 
 const COLORS = [
   '#4dd2ff', '#ff79c6', '#ffd166', '#a78bfa', '#ff8c42',
@@ -82,7 +90,8 @@ function rosterFor(exceptId) {
 
 wss.on('connection', (ws, req) => {
   const origin = req.headers.origin;
-  if (ALLOWED_ORIGINS.length && !ALLOWED_ORIGINS.includes(origin)) {
+  if (!originAllowed(origin)) {
+    console.log(`[!] WS rejected origin: ${origin || '(none)'}`);
     ws.close(1008, 'origin not allowed');
     return;
   }
@@ -132,13 +141,6 @@ wss.on('connection', (ws, req) => {
       if (kind === 'death' || kind === 'win' || kind === 'checkpoint') {
         broadcast({ t: 'event', kind, id, name: p.name, label: String(msg.label || '').slice(0, 24) }, id);
       }
-    } else if (msg.t === 'chat' && id !== null) {
-      const p = players.get(id);
-      if (!p) return;
-      const text = String(msg.text || '').replace(/\s+/g, ' ').trim().slice(0, 200);
-      if (!text) return;
-      // Relay to everyone (including sender) so message ordering is consistent.
-      broadcast({ t: 'chat', id, name: p.name, color: p.color, text });
     }
   });
 
@@ -165,5 +167,5 @@ setInterval(() => {
 }, 30000);
 
 server.listen(PORT, () => {
-  console.log(`WORLD CUP RUN running -> http://localhost:${PORT}`);
+  console.log(`BULLRUN running -> http://localhost:${PORT}`);
 });

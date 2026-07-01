@@ -3,21 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>WORLD CUP RUN — Road to the Final</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M11 4 L21 4 L21 8 L25 8 L25 12 Q25 16 21 17 L21 21 L19 24 L19 27 L23 30 L9 30 L13 27 L13 24 L11 21 L11 17 Q7 16 7 12 L7 8 L11 8 Z' fill='%23ffd166'/%3E%3C/svg%3E">
+<title>BULLRUN — Run to $1B Market Cap</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M7 7 Q3 3 8 5 Q13 7 13 12' stroke='%234ade80' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3Cpath d='M25 7 Q29 3 24 5 Q19 7 19 12' stroke='%234ade80' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3Cellipse cx='16' cy='18' rx='8' ry='9' fill='%234ade80'/%3E%3Ccircle cx='13' cy='16' r='1.4' fill='%2307120c'/%3E%3Ccircle cx='19' cy='16' r='1.4' fill='%2307120c'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --green: #2ecc71;
+    --green: #22c55e;
     --green-bright: #4ade80;
-    --gold: #ffd166;
+    --gold: #fbbf24;
+    --amber: #f59e0b;
     --red: #ef4444;
-    --bg: #07120c;
-    --panel: rgba(8, 24, 16, 0.85);
-    --text: #e8eef2;
-    --dim: #8aa092;
+    --bg: #050508;
+    --panel: rgba(10, 12, 18, 0.88);
+    --border: rgba(251, 191, 36, 0.22);
+    --text: #f1f5f9;
+    --dim: #94a3b8;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { height: 100%; overflow: hidden; background: var(--bg); }
@@ -54,31 +56,31 @@
   #mcap-label { font-size: 11px; color: var(--dim); letter-spacing: 3px; margin-top: 2px; }
   .bounty {
     display: inline-block; margin-top: 8px;
-    background: rgba(255, 209, 102, 0.08);
-    border: 1px solid rgba(255, 209, 102, 0.45);
+    background: rgba(251, 191, 36, 0.08);
+    border: 1px solid rgba(251, 191, 36, 0.45);
     border-radius: 999px;
     padding: 5px 16px;
-    font-size: 12px; letter-spacing: 1px; color: #ffd166;
-    text-shadow: 0 0 12px rgba(255, 209, 102, 0.4);
+    font-size: 12px; letter-spacing: 1px; color: var(--gold);
+    text-shadow: 0 0 12px rgba(251, 191, 36, 0.35);
     animation: bounty-pulse 2.2s ease-in-out infinite;
   }
   .bounty b { font-weight: 800; }
   @keyframes bounty-pulse {
-    0%, 100% { box-shadow: 0 0 8px rgba(255, 209, 102, 0.15); }
-    50% { box-shadow: 0 0 22px rgba(255, 209, 102, 0.45); }
+    0%, 100% { box-shadow: 0 0 8px rgba(251, 191, 36, 0.12); }
+    50% { box-shadow: 0 0 22px rgba(251, 191, 36, 0.4); }
   }
 
   #timer-box {
     position: absolute; top: 16px; right: 16px; text-align: right;
-    background: var(--panel); border: 1px solid #1d2935; border-radius: 8px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
     padding: 8px 12px;
   }
-  #timer { font-size: 20px; font-weight: 700; color: #ffd166; }
+  #timer { font-size: 20px; font-weight: 700; color: var(--gold); }
   #checkpoint-label { font-size: 11px; color: var(--dim); margin-top: 2px; }
 
   #players-box {
     position: absolute; top: 16px; left: 16px;
-    background: var(--panel); border: 1px solid #1d2935; border-radius: 8px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
     padding: 8px 12px; min-width: 170px; max-width: 230px;
   }
   #online-count { font-size: 11px; color: var(--dim); letter-spacing: 1px; margin-bottom: 6px; }
@@ -124,82 +126,11 @@
     transition: opacity 1s;
   }
 
-  /* ---------- Live chat (docked bottom-left, out of the play area) ---------- */
-  #chat {
-    position: fixed; left: 14px; bottom: 14px; z-index: 9;
-    width: 290px; max-width: calc(100vw - 28px);
-    background: var(--panel); border: 1px solid #1d2935; border-radius: 10px;
-    display: none; flex-direction: column; overflow: hidden;
-    backdrop-filter: blur(6px);
-    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
-  }
-  #chat.visible { display: flex; }
-  #chat-header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 8px 12px; cursor: default;
-    border-bottom: 1px solid #1d2935;
-  }
-  #chat-title {
-    font-size: 11px; letter-spacing: 2px; color: var(--dim);
-    display: flex; align-items: center; gap: 6px;
-  }
-  #chat-title .dot {
-    width: 7px; height: 7px; border-radius: 50%; background: #475569;
-  }
-  #chat-title .dot.live { background: var(--green-bright); box-shadow: 0 0 6px var(--green-bright); }
-  #chat-toggle {
-    pointer-events: auto; cursor: pointer;
-    background: transparent; border: 1px solid #2a3a4a; border-radius: 6px;
-    color: var(--text); font: inherit; font-size: 11px; letter-spacing: 1px;
-    padding: 4px 10px; transition: border-color 0.1s, color 0.1s;
-  }
-  #chat-toggle:hover { border-color: var(--green); color: var(--green-bright); }
-
-  #chat-body { display: flex; flex-direction: column; }
-  #chat.disabled #chat-body { display: none; }
-  #chat.disabled #chat-title .dot { background: #475569; box-shadow: none; }
-
-  #chat-messages {
-    height: 190px; overflow-y: auto; overflow-x: hidden;
-    padding: 8px 12px; display: flex; flex-direction: column; gap: 5px;
-    font-size: 12px; line-height: 1.45;
-    scrollbar-width: thin; scrollbar-color: #2a3a4a transparent;
-  }
-  #chat-messages::-webkit-scrollbar { width: 7px; }
-  #chat-messages::-webkit-scrollbar-thumb { background: #2a3a4a; border-radius: 4px; }
-  .chat-msg { word-break: break-word; }
-  .chat-msg .who { font-weight: 700; }
-  .chat-msg.me .who::after { content: ' (you)'; color: var(--dim); font-weight: 400; }
-  .chat-msg .txt { color: var(--text); }
-  .chat-sys { color: var(--dim); font-style: italic; font-size: 11px; }
-
-  #chat-nick { font-size: 11px; color: var(--dim); padding: 0 12px 6px; }
-  #chat-nick b { color: var(--text); font-weight: 700; }
-
-  #chat-form { display: flex; gap: 6px; padding: 0 10px 10px; }
-  #chat-input {
-    flex: 1; min-width: 0; pointer-events: auto;
-    background: #0f1722; border: 1px solid #2a3a4a; border-radius: 7px;
-    color: var(--text); font: inherit; font-size: 13px; padding: 8px 10px; outline: none;
-  }
-  #chat-input:focus { border-color: var(--green); }
-  #chat-send {
-    pointer-events: auto; cursor: pointer;
-    background: var(--green); color: #04140a; border: none; border-radius: 7px;
-    font: inherit; font-size: 13px; font-weight: 700; padding: 8px 12px;
-  }
-  #chat-send:hover { box-shadow: 0 0 14px rgba(46, 204, 113, 0.4); }
-
-  @media (max-width: 560px) {
-    #chat { width: calc(100vw - 28px); }
-    #chat-messages { height: 130px; }
-  }
-
   /* ---------- Overlays ---------- */
   .overlay {
     position: fixed; inset: 0; display: none;
     align-items: center; justify-content: center;
-    background: radial-gradient(ellipse at center, rgba(11,15,20,0.6) 0%, rgba(11,15,20,0.95) 100%);
+    background: radial-gradient(ellipse at center, rgba(5,5,8,0.55) 0%, rgba(5,5,8,0.96) 100%);
     z-index: 10;
   }
   .overlay.visible { display: flex; }
@@ -210,17 +141,9 @@
     color: var(--green-bright);
     text-shadow: 0 0 30px rgba(74, 222, 128, 0.5);
   }
-  .logo .cup { color: var(--gold); text-shadow: 0 0 30px rgba(255, 209, 102, 0.5); }
+  .logo .cup { color: var(--gold); text-shadow: 0 0 30px rgba(251, 191, 36, 0.45); }
   .tagline { color: var(--dim); margin: 10px 0 30px; font-size: 14px; letter-spacing: 1px; }
   .tagline b { color: var(--text); }
-
-  #name-input {
-    width: 100%; max-width: 300px;
-    background: #0f1722; border: 1px solid #2a3a4a; border-radius: 8px;
-    color: var(--text); font: inherit; font-size: 17px; text-align: center;
-    padding: 12px; outline: none; margin-bottom: 14px;
-  }
-  #name-input:focus { border-color: var(--green); }
 
   #wallet-label {
     font-size: 11px; color: var(--dim); letter-spacing: 2px;
@@ -232,7 +155,7 @@
   }
   #wallet-input {
     width: 100%; max-width: 360px;
-    background: #0f1722; border: 1px solid #2a3a4a; border-radius: 8px;
+    background: #0c0e14; border: 1px solid #2a3142; border-radius: 8px;
     color: var(--text); font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
     font-size: 13px; text-align: center;
     padding: 11px 12px; outline: none; margin-bottom: 22px;
@@ -263,48 +186,18 @@
     color: var(--text); font: inherit; font-size: 11px; letter-spacing: 1px;
     padding: 6px 12px; transition: border-color 0.1s, color 0.1s;
   }
-  #win-wallet-copy:hover { border-color: var(--green); color: var(--green-bright); }
-
-  #country-label {
-    font-size: 11px; color: var(--dim); letter-spacing: 2px;
-    margin: 4px 0 10px;
-  }
-  #country-grid {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 8px; margin-bottom: 22px;
-    max-height: 220px; overflow-y: auto; padding: 2px;
-    scrollbar-width: thin; scrollbar-color: #2a4a38 transparent;
-  }
-  #country-grid::-webkit-scrollbar { width: 7px; }
-  #country-grid::-webkit-scrollbar-thumb { background: #2a4a38; border-radius: 4px; }
-  .country-tile {
-    cursor: pointer; pointer-events: auto;
-    background: #0f1f17; border: 1px solid #234a36; border-radius: 9px;
-    padding: 8px 4px 7px; text-align: center;
-    transition: border-color 0.12s, transform 0.08s, box-shadow 0.12s;
-  }
-  .country-tile:hover { border-color: var(--green); transform: translateY(-1px); }
-  .country-tile.selected {
-    border-color: var(--gold);
-    box-shadow: 0 0 16px rgba(255, 209, 102, 0.35);
-    background: rgba(255, 209, 102, 0.08);
-  }
-  .country-tile .flag { font-size: 22px; line-height: 1; }
-  .country-tile .cname { font-size: 10px; color: var(--dim); margin-top: 4px; letter-spacing: 0.5px; }
-  .country-tile.selected .cname { color: var(--gold); }
-  @media (max-width: 480px) {
-    #country-grid { grid-template-columns: repeat(3, 1fr); }
-  }
+  #win-wallet-copy:hover { border-color: var(--gold); color: var(--gold); }
 
   .btn {
     display: inline-block; cursor: pointer; pointer-events: auto;
-    background: var(--green); color: #04140a; border: none; border-radius: 8px;
+    background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%);
+    color: #0a0a0a; border: none; border-radius: 8px;
     font: inherit; font-size: 18px; font-weight: 800; letter-spacing: 2px;
     padding: 13px 42px;
-    box-shadow: 0 0 24px rgba(46, 204, 113, 0.35);
+    box-shadow: 0 0 24px rgba(251, 191, 36, 0.35);
     transition: transform 0.1s, box-shadow 0.1s;
   }
-  .btn:hover { transform: translateY(-2px); box-shadow: 0 0 34px rgba(46, 204, 113, 0.55); }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 0 34px rgba(251, 191, 36, 0.5); }
   .btn:active { transform: translateY(0); }
 
   .controls-hint { margin-top: 26px; font-size: 12px; color: var(--dim); line-height: 2; }
@@ -317,7 +210,7 @@
   #spectate-bar {
     position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
     z-index: 11; display: none; align-items: center; gap: 14px;
-    background: var(--panel); border: 1px solid rgba(74, 222, 128, 0.4);
+    background: var(--panel); border: 1px solid rgba(251, 191, 36, 0.35);
     border-radius: 12px; padding: 10px 14px;
     backdrop-filter: blur(6px);
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
@@ -340,9 +233,7 @@
   /* keep the stream clean: hide the single-player HUD chrome while spectating */
   body.spectating #mcap-box,
   body.spectating #timer-box,
-  body.spectating #hint,
-  body.spectating #chat-nick,
-  body.spectating #chat-form { display: none; }
+  body.spectating #hint { display: none; }
 
   #win-time { font-size: 40px; font-weight: 800; color: #ffd166; margin: 8px 0 4px; }
   #win-sub { color: var(--dim); font-size: 13px; margin-bottom: 28px; }
@@ -364,10 +255,10 @@
     <div id="leaderboard"></div>
   </div>
   <div id="mcap-box">
-    <div id="mcap-title">Road to the Final</div>
-    <div id="mcap">GROUP STAGE</div>
-    <div id="mcap-label">FINAL &middot; LIFT THE TROPHY</div>
-    <div class="bounty">FIRST TO LIFT THE TROPHY WINS <b>5 SOL</b></div>
+    <div id="mcap-title">BULLRUN</div>
+    <div id="mcap">$0</div>
+    <div id="mcap-label">MARKET CAP &middot; TARGET $1B</div>
+    <div class="bounty">FIRST TO $1B WINS <b>5 SOL</b></div>
   </div>
   <div id="timer-box">
     <div id="timer">0:00.0</div>
@@ -375,21 +266,6 @@
   </div>
   <div id="toasts"></div>
   <div id="hint">SPACE / TAP TO JUMP &middot; DOUBLE JUMP AVAILABLE</div>
-</div>
-
-<div id="chat">
-  <div id="chat-header">
-    <span id="chat-title"><span class="dot"></span>LIVE CHAT</span>
-    <button id="chat-toggle" type="button">disable</button>
-  </div>
-  <div id="chat-body">
-    <div id="chat-messages"></div>
-    <div id="chat-nick">chatting as <b id="chat-nick-name">…</b></div>
-    <form id="chat-form" autocomplete="off">
-      <input id="chat-input" maxlength="200" placeholder="say something…" autocomplete="off" spellcheck="false">
-      <button id="chat-send" type="submit">send</button>
-    </form>
-  </div>
 </div>
 
 <div id="spectate-bar">
@@ -404,30 +280,27 @@
 
 <div id="title-screen" class="overlay visible">
   <div class="panel">
-    <div class="logo">WORLD <span class="cup">CUP</span> RUN</div>
-    <div class="tagline">Group Stage &rarr; <b>Round of 16</b> &middot;&middot;&middot; dribble all the way to <b>lift the Trophy</b></div>
-    <div class="bounty" style="margin: 0 0 24px;">FIRST TO LIFT THE TROPHY WINS <b>5 SOL</b></div>
+    <div class="logo">BULL<span class="cup">RUN</span></div>
+    <div class="tagline">Charge from <b>launch</b> &middot;&middot;&middot; stampede the chart all the way to a <b>$1B market cap</b></div>
+    <div class="bounty" style="margin: 0 0 24px;">FIRST TO $1B WINS <b>5 SOL</b></div>
     <br>
-    <input id="name-input" maxlength="16" placeholder="your name" autocomplete="off" spellcheck="false">
-    <div id="country-label">PICK YOUR NATION</div>
-    <div id="country-grid"></div>
     <div id="wallet-label">YOUR SOLANA WALLET ADDRESS</div>
-    <div id="wallet-note">Required to claim the 5 SOL bounty — if you lift the Trophy first, the reward is paid manually to this address.</div>
+    <div id="wallet-note">Paste your public wallet to charge — required to claim the 5 SOL bounty if you hit $1B first.</div>
     <input id="wallet-input" maxlength="64" placeholder="paste your SOL public address" autocomplete="off" spellcheck="false">
-    <button id="start-btn" class="btn">KICK OFF</button>
+    <button id="start-btn" class="btn">CHARGE</button>
     <div class="controls-hint">
       <kbd>SPACE</kbd> / <kbd>TAP</kbd> jump &middot; press again to double jump<br>
-      hurdle defenders &middot; clear the touchlines &middot; stay onside under the flag
+      dodge the bears &middot; leap the rug pulls &middot; duck under the FUD
     </div>
   </div>
 </div>
 
 <div id="win-screen" class="overlay">
   <div class="panel">
-    <div class="win-title">CHAMPIONS OF THE WORLD</div>
-    <div class="tagline" id="win-nation">you lifted the Trophy.</div>
+    <div class="win-title">BULL MARKET CHAMPION</div>
+    <div class="tagline" id="win-nation">you ran it to $1B.</div>
     <div id="win-time">0:00.0</div>
-    <div id="win-sub">matches survived &middot; tackles taken: <span id="win-deaths">0</span></div>
+    <div id="win-sub">candles survived &middot; liquidations taken: <span id="win-deaths">0</span></div>
     <div id="win-wallet-wrap">
       <div id="win-wallet-cap">REWARD WALLET (5 SOL PAID HERE)</div>
       <div id="win-wallet">
@@ -443,8 +316,8 @@
 'use strict';
 
 // =====================================================================
-//  WORLD CUP RUN — footballer stickman runner
-//  Pick a nation, run the pitch, dodge defenders, lift the Trophy.
+//  BULLRUN — charging-bull endless runner
+//  Enter wallet, charge the chart, dodge the bears, hit $1B.
 //  World coordinates: x grows right, y grows UP.
 // =====================================================================
 
@@ -454,30 +327,6 @@
 const SPECTATE_SECRET = 'wc-admin-9Fk3Qz7Rm2Tx';
 const isSpectator = new URLSearchParams(location.search).get('spectate') === SPECTATE_SECRET;
 let spectateId = null; // id of the runner currently being watched
-
-// ---------- nations (curated 2026 contenders) ----------
-// jersey/shorts/socks/boots are kit colors used to draw the stickman.
-const NATIONS = [
-  { code: 'BRA', name: 'Brazil',      flag: '🇧🇷', jersey: '#fcd116', shorts: '#1f3a93', socks: '#ffffff', boots: '#111111', accent: '#1f9e54' },
-  { code: 'ARG', name: 'Argentina',   flag: '🇦🇷', jersey: '#75aadb', shorts: '#111827', socks: '#ffffff', boots: '#ffffff', accent: '#f4d03f' },
-  { code: 'FRA', name: 'France',      flag: '🇫🇷', jersey: '#1e3a8a', shorts: '#ffffff', socks: '#dc2626', boots: '#111111', accent: '#dc2626' },
-  { code: 'ENG', name: 'England',     flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', jersey: '#ffffff', shorts: '#1e3a8a', socks: '#ffffff', boots: '#111111', accent: '#dc2626' },
-  { code: 'ESP', name: 'Spain',       flag: '🇪🇸', jersey: '#dc2626', shorts: '#1e3a8a', socks: '#1e3a8a', boots: '#111111', accent: '#fcd116' },
-  { code: 'GER', name: 'Germany',     flag: '🇩🇪', jersey: '#f3f4f6', shorts: '#111827', socks: '#f3f4f6', boots: '#111111', accent: '#dc2626' },
-  { code: 'POR', name: 'Portugal',    flag: '🇵🇹', jersey: '#dc2626', shorts: '#15803d', socks: '#dc2626', boots: '#111111', accent: '#15803d' },
-  { code: 'NED', name: 'Netherlands', flag: '🇳🇱', jersey: '#f97316', shorts: '#111827', socks: '#f97316', boots: '#111111', accent: '#1e3a8a' },
-  { code: 'USA', name: 'USA',         flag: '🇺🇸', jersey: '#ffffff', shorts: '#1e3a8a', socks: '#ffffff', boots: '#111111', accent: '#dc2626' },
-  { code: 'MEX', name: 'Mexico',      flag: '🇲🇽', jersey: '#15803d', shorts: '#ffffff', socks: '#dc2626', boots: '#111111', accent: '#dc2626' },
-  { code: 'CAN', name: 'Canada',      flag: '🇨🇦', jersey: '#dc2626', shorts: '#ffffff', socks: '#dc2626', boots: '#111111', accent: '#ffffff' },
-  { code: 'JPN', name: 'Japan',       flag: '🇯🇵', jersey: '#1e40af', shorts: '#1e40af', socks: '#1e40af', boots: '#111111', accent: '#dc2626' },
-  { code: 'BEL', name: 'Belgium',     flag: '🇧🇪', jersey: '#dc2626', shorts: '#111827', socks: '#fcd116', boots: '#111111', accent: '#fcd116' },
-  { code: 'CRO', name: 'Croatia',     flag: '🇭🇷', jersey: '#dc2626', shorts: '#ffffff', socks: '#1e3a8a', boots: '#111111', accent: '#ffffff' },
-  { code: 'MAR', name: 'Morocco',     flag: '🇲🇦', jersey: '#c1272d', shorts: '#15803d', socks: '#c1272d', boots: '#111111', accent: '#15803d' },
-  { code: 'URU', name: 'Uruguay',     flag: '🇺🇾', jersey: '#5b9bd5', shorts: '#111827', socks: '#111827', boots: '#111111', accent: '#ffffff' },
-];
-const NATION_BY_CODE = Object.fromEntries(NATIONS.map((n) => [n.code, n]));
-const DEFAULT_KIT = { jersey: '#e8eef2', shorts: '#334155', socks: '#e8eef2', boots: '#111111', accent: '#4ade80' };
-function kitFor(code) { return NATION_BY_CODE[code] || DEFAULT_KIT; }
 
 // ---------- canvas ----------
 const canvas = document.getElementById('game');
@@ -491,6 +340,73 @@ function resize() {
 }
 window.addEventListener('resize', resize);
 resize();
+
+// ---------- bull sprite (charging runner) ----------
+// The sprite sheet ships as two side-by-side gallop frames on a white
+// background (the generator flattened alpha), so we chroma-key the white
+// out at load time into per-frame offscreen canvases with trimmed bounds.
+const BULL = {
+  ready: false,
+  frames: [],     // [{ canvas, w, h }] content-trimmed, transparent
+  count: 2,
+};
+(function loadBullSprite() {
+  const img = new Image();
+  img.onload = () => {
+    try {
+      const sheet = document.createElement('canvas');
+      sheet.width = img.width; sheet.height = img.height;
+      const sctx = sheet.getContext('2d');
+      sctx.drawImage(img, 0, 0);
+      const fw = Math.floor(img.width / BULL.count);
+      for (let f = 0; f < BULL.count; f++) {
+        BULL.frames.push(extractFrame(sctx, f * fw, 0, fw, img.height));
+      }
+      BULL.ready = BULL.frames.every((fr) => fr && fr.w > 0);
+    } catch (e) { BULL.ready = false; }
+  };
+  img.onerror = () => { BULL.ready = false; };
+  img.src = 'assets/bull-runner-sheet.png';
+})();
+
+// Chroma-key neutral backgrounds and trim to content bounds. If the PNG
+// already has alpha (RGBA), combine both so checkerboard never shows.
+function extractFrame(sctx, sx0, sy0, sw, sh) {
+  const data = sctx.getImageData(sx0, sy0, sw, sh);
+  const px = data.data;
+  let minX = sw, minY = sh, maxX = 0, maxY = 0, found = false;
+  for (let y = 0; y < sh; y++) {
+    for (let x = 0; x < sw; x++) {
+      const i = (y * sw + x) * 4;
+      const r = px[i], g = px[i + 1], b = px[i + 2];
+      const srcA = px[i + 3];
+      const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+      const sat = mx - mn;
+      const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+      let a = srcA;
+      if (lum >= 235 && sat <= 30) a = 0;
+      else if (lum >= 165 && sat <= 20) {
+        const t = (lum - 165) / 70;
+        a = Math.min(a, Math.round((1 - t) * 255));
+      }
+      px[i + 3] = a;
+      if (a > 20) {
+        found = true;
+        if (x < minX) minX = x; if (x > maxX) maxX = x;
+        if (y < minY) minY = y; if (y > maxY) maxY = y;
+      }
+    }
+  }
+  if (!found) return { canvas: null, w: 0, h: 0 };
+  const tmp = document.createElement('canvas');
+  tmp.width = sw; tmp.height = sh;
+  tmp.getContext('2d').putImageData(data, 0, 0);
+  const cw = maxX - minX + 1, ch = maxY - minY + 1;
+  const out = document.createElement('canvas');
+  out.width = cw; out.height = ch;
+  out.getContext('2d').drawImage(tmp, minX, minY, cw, ch, 0, 0, cw, ch);
+  return { canvas: out, w: cw, h: ch };
+}
 
 // ---------- helpers ----------
 const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
@@ -508,25 +424,39 @@ function mulberry32(seed) {
 }
 const WORLD_SEED = 0x5BEED;
 
-// ---------- tournament progression model ----------
-// Progress is just distance run; stages mark how far along the bracket you are.
+// ---------- market-cap progression model ----------
+// Progress is just distance run; milestones mark market-cap tiers on the
+// way to a $1B cap (the win). Distance maps linearly to market cap.
 const X_WIN = 756000;
+const MARKET_CAP_TARGET = 1e9; // $1B
 const METERS_PER_UNIT = 0.013; // world units -> on-screen "meters" for the HUD
 
 const STAGES = [
-  { x: 0,            label: 'GROUP STAGE' },
-  { x: X_WIN * 0.12, label: 'ROUND OF 16' },
-  { x: X_WIN * 0.27, label: 'QUARTER-FINAL' },
-  { x: X_WIN * 0.46, label: 'SEMI-FINAL' },
-  { x: X_WIN * 0.70, label: 'FINAL' },
+  { x: 0,            label: 'LAUNCH' },
+  { x: X_WIN * 0.12, label: '$10M' },
+  { x: X_WIN * 0.27, label: '$100M' },
+  { x: X_WIN * 0.46, label: '$500M' },
+  { x: X_WIN * 0.70, label: '$900M' },
 ];
-// Respawn flags = every stage past the group stage.
+// Respawn flags = every milestone past launch.
 const CHECKPOINTS = STAGES.slice(1).map((s) => ({ x: s.x, label: s.label }));
 
 function stageAt(x) {
   let label = STAGES[0].label;
   for (const s of STAGES) { if (x >= s.x) label = s.label; }
   return label;
+}
+
+// Live market cap for a given distance, formatted like $1.2B / $340M.
+function marketCapAt(x) {
+  return clamp(x / X_WIN, 0, 1) * MARKET_CAP_TARGET;
+}
+function fmtMarketCap(x) {
+  const mc = marketCapAt(x);
+  if (mc >= 1e9) return '$' + (mc / 1e9).toFixed(2) + 'B';
+  if (mc >= 1e6) return '$' + (mc / 1e6).toFixed(mc < 1e7 ? 1 : 0) + 'M';
+  if (mc >= 1e3) return '$' + (mc / 1e3).toFixed(0) + 'K';
+  return '$0';
 }
 function fmtTime(s) {
   const m = Math.floor(s / 60);
@@ -752,20 +682,16 @@ function die(reason) {
   spawnDeathParticles(player.x, player.y + 32);
   sfx.death();
   net.sendEvent('death', stageAt(player.x));
-  toast(reason + ' — back to ' + (player.checkpointIdx >= 0 ? CHECKPOINTS[player.checkpointIdx].label : 'kickoff'), 'bad');
+  toast(reason + ' — back to ' + (player.checkpointIdx >= 0 ? CHECKPOINTS[player.checkpointIdx].label : 'launch'), 'bad');
 }
 
 function winRun() {
   player.state = 'won';
   sfx.win();
   net.sendEvent('win', fmtTime(player.runTime));
-  const nation = NATION_BY_CODE[myCountry];
-  const kit = kitFor(myCountry);
-  spawnConfetti([kit.jersey, kit.shorts, kit.accent, '#ffd166', '#ffffff']);
+  spawnConfetti(['#4ade80', '#fbbf24', '#22c55e', '#ffffff', '#f59e0b']);
   const nationEl = document.getElementById('win-nation');
-  if (nationEl) nationEl.innerHTML = nation
-    ? nation.flag + ' <b>' + escapeHtml(nation.name) + '</b> lifted the Trophy!'
-    : 'you lifted the Trophy.';
+  if (nationEl) nationEl.textContent = 'you ran it to $1B.';
   document.getElementById('win-time').textContent = fmtTime(player.runTime);
   document.getElementById('win-deaths').textContent = player.deaths;
   const walletAddrEl = document.getElementById('win-wallet-addr');
@@ -822,11 +748,11 @@ function updatePlayer(dt) {
   // fell into a rug pull — die as soon as you drop below the chart line inside a gap
   const activeGap = gapAt(player.x);
   if (!player.grounded && activeGap && player.y < activeGap.y - 50) {
-    die('ball out of play');
+    die('liquidated');
     return;
   }
   if (!player.grounded && player.y < player.lastGroundY - 160) {
-    die('ball out of play');
+    die('liquidated');
     return;
   }
 
@@ -835,7 +761,7 @@ function updatePlayer(dt) {
   if (nextIdx < CHECKPOINTS.length && player.x >= CHECKPOINTS[nextIdx].x) {
     player.checkpointIdx = nextIdx;
     sfx.checkpoint();
-    toast('QUALIFIED — ' + CHECKPOINTS[nextIdx].label, 'good');
+    toast('NEW ATH — ' + CHECKPOINTS[nextIdx].label, 'good');
     pruneBehind(CHECKPOINTS[nextIdx].x);
   }
 
@@ -848,7 +774,7 @@ function updatePlayer(dt) {
     if (o.x > player.x + 200) break;
     if (o.x + o.w < player.x - 200) continue;
     if (pb.x < o.x + o.w && pb.x + pb.w > o.x && pb.y < o.y + o.h && pb.y + pb.h > o.y) {
-      die({ defender: 'tackled by a defender', tackle: 'slide-tackled', keeper: 'denied by the keeper', offside: 'caught offside', redcard: 'sent off' }[o.type] || 'fouled');
+      die({ defender: 'mauled by a bear', tackle: 'caught in a dump', keeper: 'dumped on by a whale', offside: 'hit by FUD', redcard: 'got rugged' }[o.type] || 'rekt');
       return;
     }
   }
@@ -920,8 +846,9 @@ function updateParticles(dt) {
   }
 }
 
-// ---------- footballer drawing ----------
-// Stickman footballer in a national kit, facing right.
+// ---------- runner drawing ----------
+// Primary path draws the bull sprite (drawBullRunner). The stickman below is
+// only a fallback used if the sprite sheet fails to load.
 // (x, y) = feet position in SCREEN coordinates.
 function drawBoot(c, p, color) {
   c.save();
@@ -945,9 +872,74 @@ function drawBall(c, cx, cy, r) {
   c.restore();
 }
 function drawRunner(c, x, y, phase, opts) {
+  if (BULL.ready) { drawBullRunner(c, x, y, phase, opts); return; }
+  drawRunnerFallback(c, x, y, phase, opts);
+}
+
+// Bull sprite runner — alternating gallop frames + bob/tilt/shadow/dust.
+// (x, y) = hooves position in SCREEN coordinates.
+function drawBullRunner(c, x, y, phase, opts) {
   const o = opts || {};
-  const kit = o.kit || DEFAULT_KIT;
-  const nameCol = o.color || kit.accent || '#e8eef2';
+  const accent = o.color || '#4ade80';
+  const alpha = o.alpha != null ? o.alpha : 1;
+  const dead = !!o.dead;
+  const airborne = !!o.airborne;
+  const baseH = 112;
+
+  const idx = airborne ? 1 : ((Math.floor(phase * 0.5) % BULL.count) + BULL.count) % BULL.count;
+  const frame = BULL.frames[idx] || BULL.frames[0];
+  if (!frame || !frame.canvas) return;
+  const h = baseH, w = h * (frame.w / frame.h);
+  const bob = (airborne || dead) ? 0 : Math.abs(Math.sin(phase * 0.5)) * 5;
+  const tilt = dead ? 0.5 : airborne ? -0.12 : Math.sin(phase * 0.5) * 0.04;
+
+  c.save();
+  c.globalAlpha = alpha;
+
+  // ground shadow (shrinks while airborne)
+  const shScale = airborne ? 0.6 : 1 - bob / 14;
+  c.save();
+  c.globalAlpha = alpha * 0.35;
+  c.fillStyle = '#000';
+  c.beginPath();
+  c.ellipse(x, y - 1, w * 0.38 * shScale, 5 * shScale, 0, 0, 7);
+  c.fill();
+  c.restore();
+
+  // kicked-up dust while charging on the ground
+  if (!airborne && !dead && Math.random() < 0.45) {
+    particles.push({
+      x: (x - w * 0.32) + cam.x, y: H + cam.y - y,
+      vx: -(30 + Math.random() * 55), vy: 55 + Math.random() * 55,
+      life: 0.25 + Math.random() * 0.2,
+      color: 'rgba(120,130,140,0.45)', r: 1.5 + Math.random() * 2,
+    });
+  }
+
+  // the bull (transparent PNG — no background box)
+  // On death, dim the sprite instead of tinting (a source-atop fill would
+  // paint a red rectangle over the opaque game background).
+  c.save();
+  if (dead) c.globalAlpha = alpha * 0.55;
+  c.translate(x, y - h + bob);
+  if (tilt) { c.translate(0, h); c.rotate(tilt); c.translate(0, -h); }
+  c.drawImage(frame.canvas, -w / 2, 0, w, h);
+  c.restore();
+
+  // name tag (color distinguishes runners)
+  if (o.name) {
+    c.globalAlpha = Math.min(1, alpha + 0.25);
+    c.font = '700 11px ui-monospace, Menlo, monospace';
+    c.textAlign = 'center';
+    c.fillStyle = accent;
+    c.fillText(o.name, x, y - h - 8);
+  }
+  c.restore();
+}
+
+function drawRunnerFallback(c, x, y, phase, opts) {
+  const o = opts || {};
+  const nameCol = o.color || '#4ade80';
   const alpha = o.alpha != null ? o.alpha : 1;
   const dead = !!o.dead;
   const airborne = !!o.airborne;
@@ -974,18 +966,18 @@ function drawRunner(c, x, y, phase, opts) {
     knee1 = { x: x + s1 * 9, y: hipY + 15 }; foot1 = { x: x + s1 * 15 + 3, y: y - Math.max(0, -s1) * 8 };
     knee2 = { x: x + s2 * 9, y: hipY + 15 }; foot2 = { x: x + s2 * 15 + 3, y: y - Math.max(0, -s2) * 8 };
   }
-  c.strokeStyle = kit.socks; c.lineWidth = 4;
+  c.strokeStyle = '#334155'; c.lineWidth = 4;
   c.beginPath();
   c.moveTo(x, hipY); c.lineTo(knee2.x, knee2.y); c.lineTo(foot2.x, foot2.y);
   c.stroke();
-  drawBoot(c, foot2, kit.boots);
+  drawBoot(c, foot2, '#111111');
   c.beginPath();
   c.moveTo(x, hipY); c.lineTo(knee1.x, knee1.y); c.lineTo(foot1.x, foot1.y);
   c.stroke();
-  drawBoot(c, foot1, kit.boots);
+  drawBoot(c, foot1, '#111111');
 
   // ---- shorts ----
-  c.fillStyle = kit.shorts;
+  c.fillStyle = '#334155';
   c.beginPath();
   c.moveTo(x - 8, hipY - 5);
   c.lineTo(x + 9, hipY - 5);
@@ -1016,7 +1008,7 @@ function drawRunner(c, x, y, phase, opts) {
   c.stroke();
 
   // ---- jersey ----
-  c.fillStyle = kit.jersey;
+  c.fillStyle = '#1e293b';
   c.beginPath();
   c.moveTo(x - 9, shY - 1);
   c.lineTo(x + 10, shY - 1);
@@ -1026,7 +1018,7 @@ function drawRunner(c, x, y, phase, opts) {
   c.fill();
   c.lineWidth = 1; c.strokeStyle = 'rgba(0,0,0,0.3)'; c.stroke();
   // accent collar stripe
-  c.fillStyle = kit.accent;
+  c.fillStyle = '#4ade80';
   c.fillRect(x - 9, shY - 1, 19, 3);
 
   // ---- neck + head ----
@@ -1065,39 +1057,27 @@ function drawRunner(c, x, y, phase, opts) {
     c.font = '700 11px ui-monospace, Menlo, monospace';
     c.textAlign = 'center';
     c.fillStyle = nameCol;
-    c.fillText((o.flag ? o.flag + ' ' : '') + o.name, x, y - 92);
+    c.fillText(o.name, x, y - 92);
   }
   c.restore();
 }
 
 // ---------- rendering ----------
 function drawBackground() {
-  // stadium night sky -> pitch gradient
-  const sky = ctx.createLinearGradient(0, 0, 0, H);
-  sky.addColorStop(0, '#0a1f14');
-  sky.addColorStop(0.45, '#0c2a1a');
-  sky.addColorStop(1, '#0f3a22');
-  ctx.fillStyle = sky;
+  // clean white "meme chart" backdrop
+  ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, W, H);
 
-  // floodlight glows in the upper corners
+  // faint gray grid for a hint of chart paper
   ctx.save();
-  for (const fxr of [0.18, 0.82]) {
-    const g = ctx.createRadialGradient(W * fxr, H * 0.05, 0, W * fxr, H * 0.05, H * 0.6);
-    g.addColorStop(0, 'rgba(220, 245, 230, 0.10)');
-    g.addColorStop(1, 'rgba(220, 245, 230, 0)');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, W, H);
+  ctx.strokeStyle = 'rgba(15, 23, 42, 0.05)';
+  ctx.lineWidth = 1;
+  const col = 120;
+  for (let gx = Math.floor(cam.x / col) * col; gx < cam.x + W + col; gx += col) {
+    ctx.beginPath(); ctx.moveTo(sx(gx), 0); ctx.lineTo(sx(gx), H); ctx.stroke();
   }
-  ctx.restore();
-
-  // world-locked grass stripes (vertical mowing bands)
-  const stripe = 150;
-  ctx.save();
-  for (let gx = Math.floor(cam.x / stripe) * stripe; gx < cam.x + W + stripe; gx += stripe) {
-    const band = Math.round(gx / stripe);
-    ctx.fillStyle = band % 2 ? 'rgba(255,255,255,0.018)' : 'rgba(0,0,0,0.05)';
-    ctx.fillRect(sx(gx), 0, stripe, H);
+  for (let gy = 90; gy < H; gy += 90) {
+    ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke();
   }
   ctx.restore();
 }
@@ -1113,29 +1093,13 @@ function drawTerrain() {
   for (const piece of terrain.pieces) {
     if (piece[piece.length - 1].x < xMin || piece[0].x > xMax) continue;
 
-    // fill under the line
+    // bold green meme chart line on white
     ctx.beginPath();
     ctx.moveTo(sx(piece[0].x), sy(piece[0].y));
     for (let i = 1; i < piece.length; i++) ctx.lineTo(sx(piece[i].x), sy(piece[i].y));
-    ctx.lineTo(sx(piece[piece.length - 1].x), H + 40);
-    ctx.lineTo(sx(piece[0].x), H + 40);
-    ctx.closePath();
-    const grad = ctx.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0, 'rgba(34, 160, 90, 0.42)');
-    grad.addColorStop(1, 'rgba(15, 58, 34, 0.1)');
-    ctx.fillStyle = grad;
-    ctx.fill();
-
-    // chalk pitch line along the top of the grass
-    ctx.beginPath();
-    ctx.moveTo(sx(piece[0].x), sy(piece[0].y));
-    for (let i = 1; i < piece.length; i++) ctx.lineTo(sx(piece[i].x), sy(piece[i].y));
-    ctx.shadowColor = 'rgba(255,255,255,0.5)';
-    ctx.shadowBlur = 10;
-    ctx.strokeStyle = '#f4fff8';
-    ctx.lineWidth = 4;
+    ctx.strokeStyle = '#22c55e';
+    ctx.lineWidth = 9;
     ctx.stroke();
-    ctx.shadowBlur = 0;
   }
   ctx.restore();
 }
@@ -1146,138 +1110,181 @@ function drawObstacles() {
     if (o.x + o.w < xMin || o.x > xMax) continue;
 
     if (o.type === 'defender') {
-      // standing opponent — hurdle over them
+      // BEAR — angry red bear, hurdle over it
       const bx = sx(o.x), by = sy(o.y), w = o.w, h = o.h;
       const cx = bx + w / 2;
       ctx.save();
-      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.lineJoin = 'round';
       // legs
-      ctx.strokeStyle = '#1f2937'; ctx.lineWidth = 4;
+      ctx.fillStyle = '#991b1b';
+      ctx.fillRect(cx - w * 0.32, by - h * 0.26, w * 0.22, h * 0.26);
+      ctx.fillRect(cx + w * 0.1, by - h * 0.26, w * 0.22, h * 0.26);
+      // body
+      ctx.shadowColor = 'rgba(239,68,68,0.45)'; ctx.shadowBlur = 12;
+      ctx.fillStyle = '#b91c1c';
       ctx.beginPath();
-      ctx.moveTo(cx, by - h * 0.42); ctx.lineTo(cx - 6, by);
-      ctx.moveTo(cx, by - h * 0.42); ctx.lineTo(cx + 6, by);
-      ctx.stroke();
-      // jersey (rival red/white)
-      ctx.fillStyle = '#dc2626';
-      ctx.fillRect(cx - w * 0.34, by - h, w * 0.68, h * 0.6);
-      ctx.fillStyle = 'rgba(255,255,255,0.85)';
-      ctx.fillRect(cx - w * 0.06, by - h, w * 0.12, h * 0.6);
-      // arms out, defending
-      ctx.strokeStyle = '#e6b07f'; ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(cx - w * 0.3, by - h * 0.82); ctx.lineTo(cx - w * 0.62, by - h * 0.62);
-      ctx.moveTo(cx + w * 0.3, by - h * 0.82); ctx.lineTo(cx + w * 0.62, by - h * 0.62);
-      ctx.stroke();
-      // head + hair
-      ctx.fillStyle = '#e6b07f';
-      ctx.beginPath(); ctx.arc(cx, by - h - 3, 7, 0, 7); ctx.fill();
-      ctx.fillStyle = '#2b2320';
-      ctx.beginPath(); ctx.arc(cx, by - h - 4, 7, Math.PI, 2 * Math.PI); ctx.fill();
-      ctx.restore();
-    } else if (o.type === 'tackle') {
-      // sliding tackle — low, jump over
-      const bx = sx(o.x), by = sy(o.y), w = o.w, h = o.h;
-      ctx.save();
-      ctx.lineCap = 'round';
-      // reclined body
-      ctx.fillStyle = '#1d4ed8';
-      ctx.beginPath();
-      ctx.ellipse(bx + w * 0.6, by - h * 0.45, w * 0.3, h * 0.45, 0, 0, 7);
-      ctx.fill();
-      // extended sliding leg + boot
-      ctx.strokeStyle = '#1d4ed8'; ctx.lineWidth = 6;
-      ctx.beginPath();
-      ctx.moveTo(bx + w * 0.55, by - h * 0.4); ctx.lineTo(bx + w * 0.04, by - h * 0.18);
-      ctx.stroke();
-      ctx.fillStyle = '#111';
-      ctx.beginPath(); ctx.ellipse(bx + w * 0.03, by - h * 0.15, 7, 4, 0, 0, 7); ctx.fill();
-      // head
-      ctx.fillStyle = '#e6b07f';
-      ctx.beginPath(); ctx.arc(bx + w * 0.85, by - h * 0.55, 6, 0, 7); ctx.fill();
-      // motion streaks
-      ctx.strokeStyle = 'rgba(255,255,255,0.4)'; ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.moveTo(bx + w * 0.95, by - h * 0.25); ctx.lineTo(bx + w * 1.18, by - h * 0.25);
-      ctx.moveTo(bx + w * 0.95, by - h * 0.5); ctx.lineTo(bx + w * 1.12, by - h * 0.5);
-      ctx.stroke();
-      ctx.restore();
-    } else if (o.type === 'keeper') {
-      // diving goalkeeper — big and wide, double jump
-      const bx = sx(o.x), by = sy(o.y), w = o.w, h = o.h;
-      ctx.save();
-      ctx.lineCap = 'round';
-      ctx.shadowColor = 'rgba(0,0,0,0.35)'; ctx.shadowBlur = 8;
-      ctx.fillStyle = '#22c55e';
-      ctx.beginPath();
-      ctx.ellipse(bx + w * 0.5, by - h * 0.45, w * 0.4, h * 0.4, 0, 0, 7);
+      ctx.ellipse(cx, by - h * 0.46, w * 0.42, h * 0.42, 0, 0, 7);
       ctx.fill();
       ctx.shadowBlur = 0;
-      // reaching arm + glove
-      ctx.strokeStyle = '#16a34a'; ctx.lineWidth = 7;
+      // head + ears
+      const hx = cx, hy = by - h * 0.84, hr = w * 0.3;
+      ctx.fillStyle = '#b91c1c';
+      ctx.beginPath(); ctx.arc(hx - hr * 0.72, hy - hr * 0.62, hr * 0.42, 0, 7); ctx.fill();
+      ctx.beginPath(); ctx.arc(hx + hr * 0.72, hy - hr * 0.62, hr * 0.42, 0, 7); ctx.fill();
+      ctx.beginPath(); ctx.arc(hx, hy, hr, 0, 7); ctx.fill();
+      // snout
+      ctx.fillStyle = '#7f1d1d';
+      ctx.beginPath(); ctx.ellipse(hx, hy + hr * 0.32, hr * 0.55, hr * 0.42, 0, 0, 7); ctx.fill();
+      ctx.fillStyle = '#111';
+      ctx.beginPath(); ctx.arc(hx, hy + hr * 0.12, hr * 0.16, 0, 7); ctx.fill();
+      // angry eyes
+      ctx.fillStyle = '#fde68a';
+      ctx.beginPath(); ctx.arc(hx - hr * 0.38, hy - hr * 0.12, 2.4, 0, 7); ctx.arc(hx + hr * 0.38, hy - hr * 0.12, 2.4, 0, 7); ctx.fill();
+      ctx.strokeStyle = '#450a0a'; ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.moveTo(bx + w * 0.6, by - h * 0.55); ctx.lineTo(bx + w * 0.92, by - h * 0.98);
+      ctx.moveTo(hx - hr * 0.6, hy - hr * 0.55); ctx.lineTo(hx - hr * 0.16, hy - hr * 0.3);
+      ctx.moveTo(hx + hr * 0.6, hy - hr * 0.55); ctx.lineTo(hx + hr * 0.16, hy - hr * 0.3);
       ctx.stroke();
-      ctx.fillStyle = '#f3f4f6';
-      ctx.beginPath(); ctx.arc(bx + w * 0.95, by - h * 1.0, 8, 0, 7); ctx.fill();
-      // trailing legs
-      ctx.strokeStyle = '#15803d'; ctx.lineWidth = 6;
+      // claws
+      ctx.strokeStyle = '#fca5a5'; ctx.lineWidth = 2; ctx.lineCap = 'round';
       ctx.beginPath();
-      ctx.moveTo(bx + w * 0.4, by - h * 0.4); ctx.lineTo(bx + w * 0.08, by - h * 0.22);
-      ctx.moveTo(bx + w * 0.42, by - h * 0.5); ctx.lineTo(bx + w * 0.12, by - h * 0.6);
+      ctx.moveTo(cx - w * 0.4, by - h * 0.5); ctx.lineTo(cx - w * 0.52, by - h * 0.42);
+      ctx.moveTo(cx - w * 0.4, by - h * 0.42); ctx.lineTo(cx - w * 0.52, by - h * 0.34);
       ctx.stroke();
-      // head
-      ctx.fillStyle = '#e6b07f';
-      ctx.beginPath(); ctx.arc(bx + w * 0.72, by - h * 0.64, 7, 0, 7); ctx.fill();
-      ctx.fillStyle = '#052e16';
-      ctx.font = '700 11px ui-monospace, Menlo, monospace';
+      // label
+      ctx.fillStyle = '#b91c1c';
+      ctx.font = '800 10px ui-monospace, Menlo, monospace';
       ctx.textAlign = 'center';
-      ctx.fillText('GK', bx + w * 0.48, by - h * 0.4);
+      ctx.fillText('BEAR', cx, by - h - 6);
+      ctx.restore();
+    } else if (o.type === 'tackle') {
+      // DUMP — red candlestick spiking down, jump over
+      const bx = sx(o.x), by = sy(o.y), w = o.w, h = o.h;
+      const cx = bx + w / 2;
+      ctx.save();
+      ctx.shadowColor = 'rgba(239,68,68,0.55)'; ctx.shadowBlur = 12;
+      ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+      // wick
+      ctx.beginPath();
+      ctx.moveTo(cx, by - h - 10);
+      ctx.lineTo(cx, by + 6);
+      ctx.stroke();
+      // body
+      ctx.fillStyle = '#ef4444';
+      ctx.fillRect(cx - w * 0.32, by - h * 0.92, w * 0.64, h * 0.82);
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = '#7f1d1d'; ctx.lineWidth = 1.5;
+      ctx.strokeRect(cx - w * 0.32, by - h * 0.92, w * 0.64, h * 0.82);
+      // down arrow
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.moveTo(cx - 4, by - h * 0.62); ctx.lineTo(cx + 4, by - h * 0.62); ctx.lineTo(cx, by - h * 0.4);
+      ctx.closePath(); ctx.fill();
+      // label
+      ctx.fillStyle = '#b91c1c';
+      ctx.font = '800 10px ui-monospace, Menlo, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('DUMP', cx, by - h - 18);
+      ctx.restore();
+    } else if (o.type === 'keeper') {
+      // WHALE — big blue whale, double jump
+      const bx = sx(o.x), by = sy(o.y), w = o.w, h = o.h;
+      const cx = bx + w * 0.52, cy = by - h * 0.5;
+      ctx.save();
+      ctx.shadowColor = 'rgba(59,130,246,0.45)'; ctx.shadowBlur = 14;
+      ctx.fillStyle = '#3b82f6';
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, w * 0.42, h * 0.48, 0, 0, 7);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      // tail fluke (left)
+      ctx.beginPath();
+      ctx.moveTo(bx + w * 0.12, cy);
+      ctx.lineTo(bx - w * 0.06, cy - h * 0.42);
+      ctx.lineTo(bx + w * 0.02, cy);
+      ctx.lineTo(bx - w * 0.06, cy + h * 0.42);
+      ctx.closePath(); ctx.fill();
+      // pale belly
+      ctx.fillStyle = 'rgba(191,219,254,0.55)';
+      ctx.beginPath(); ctx.ellipse(cx, cy + h * 0.2, w * 0.32, h * 0.2, 0, 0, 7); ctx.fill();
+      // fin
+      ctx.fillStyle = '#2563eb';
+      ctx.beginPath(); ctx.ellipse(cx + w * 0.05, cy + h * 0.28, w * 0.1, h * 0.12, 0.5, 0, 7); ctx.fill();
+      // eye
+      ctx.fillStyle = '#0b1020';
+      ctx.beginPath(); ctx.arc(cx + w * 0.26, cy - h * 0.1, 3, 0, 7); ctx.fill();
+      // spout
+      ctx.strokeStyle = 'rgba(191,219,254,0.75)'; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(cx + w * 0.14, cy - h * 0.46);
+      ctx.quadraticCurveTo(cx + w * 0.06, cy - h * 0.78, cx + w * 0.2, cy - h * 0.95);
+      ctx.stroke();
+      // label
+      ctx.fillStyle = '#1d4ed8';
+      ctx.font = '800 10px ui-monospace, Menlo, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('WHALE', cx, by - h - 8);
       ctx.restore();
     } else if (o.type === 'offside') {
-      // linesman's offside flag — floats at jump height, stay grounded
+      // FUD — dark storm cloud with lightning, stay grounded
       const cx = sx(o.x + o.w / 2), cy = sy(o.y + o.h / 2);
-      const wv = Math.sin(performance.now() * 0.006 + o.x) * 0.18;
+      const bob = Math.sin(performance.now() * 0.004 + o.x) * 3;
+      const rh = o.h * 0.5, rw = o.w * 0.5;
       ctx.save();
-      ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+      ctx.translate(cx, cy + bob);
+      ctx.shadowColor = 'rgba(0,0,0,0.45)'; ctx.shadowBlur = 12;
+      ctx.fillStyle = '#475569';
       ctx.beginPath();
-      ctx.moveTo(cx - o.w * 0.3, cy + o.h * 0.55);
-      ctx.lineTo(cx - o.w * 0.3, cy - o.h * 0.6);
-      ctx.stroke();
-      ctx.save();
-      ctx.translate(cx - o.w * 0.3, cy - o.h * 0.55);
-      ctx.rotate(wv);
-      const fw = o.w * 0.62, fh = o.h * 0.7, cols = 4, rows = 3;
-      for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) {
-        ctx.fillStyle = (i + j) % 2 ? '#f8d000' : '#dc2626';
-        ctx.fillRect(i * fw / cols, j * fh / rows, fw / cols, fh / rows);
-      }
-      ctx.restore();
-      ctx.fillStyle = '#f8d000';
-      ctx.font = '700 10px ui-monospace, Menlo, monospace';
+      ctx.arc(-rw * 0.55, 0, rh * 0.9, 0, 7);
+      ctx.arc(0, -rh * 0.45, rh * 1.15, 0, 7);
+      ctx.arc(rw * 0.55, 0, rh * 0.9, 0, 7);
+      ctx.arc(0, rh * 0.25, rh * 1.0, 0, 7);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      // lightning bolt
+      ctx.fillStyle = '#fbbf24';
+      ctx.beginPath();
+      ctx.moveTo(-3, rh * 0.4); ctx.lineTo(6, rh * 0.4); ctx.lineTo(-1, rh * 0.85);
+      ctx.lineTo(4, rh * 0.85); ctx.lineTo(-6, rh * 1.35); ctx.lineTo(-2, rh * 0.75);
+      ctx.lineTo(-7, rh * 0.75); ctx.closePath(); ctx.fill();
+      // label
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '800 11px ui-monospace, Menlo, monospace';
       ctx.textAlign = 'center';
-      ctx.fillText('OFFSIDE', cx + o.w * 0.05, cy + o.h * 0.55 + 12);
+      ctx.fillText('FUD', 0, -rh * 0.45);
       ctx.restore();
     } else {
-      // red card — floats low, stay grounded
+      // RUG PULL — rug getting yanked, stay grounded
       const cx = sx(o.x + o.w / 2), cy = sy(o.y + o.h / 2);
       const tilt = Math.sin(performance.now() * 0.004 + o.x) * 0.12;
+      const cw = o.w * 0.9, ch = o.h * 0.55;
       ctx.save();
       ctx.translate(cx, cy);
       ctx.rotate(tilt);
-      ctx.shadowColor = 'rgba(220,38,38,0.6)'; ctx.shadowBlur = 12;
-      ctx.fillStyle = '#dc2626';
-      const cw = o.w * 0.5, ch = o.h * 0.95;
+      ctx.shadowColor = 'rgba(180,83,9,0.5)'; ctx.shadowBlur = 10;
+      ctx.fillStyle = '#b45309';
       ctx.beginPath();
       if (ctx.roundRect) ctx.roundRect(-cw / 2, -ch / 2, cw, ch, 4);
       else ctx.rect(-cw / 2, -ch / 2, cw, ch);
       ctx.fill();
       ctx.shadowBlur = 0;
-      ctx.strokeStyle = '#7f1d1d'; ctx.lineWidth = 1.5; ctx.stroke();
+      // woven stripes
+      ctx.fillStyle = '#7c2d12';
+      for (let i = -cw / 2 + 6; i < cw / 2 - 4; i += 10) ctx.fillRect(i, -ch / 2 + 2, 3, ch - 4);
+      // gold border
+      ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 2;
+      ctx.strokeRect(-cw / 2, -ch / 2, cw, ch);
+      // tassels
+      ctx.strokeStyle = '#fcd34d'; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
+      ctx.beginPath();
+      for (let i = -cw / 2; i <= cw / 2; i += 6) { ctx.moveTo(i, ch / 2); ctx.lineTo(i, ch / 2 + 5); }
+      ctx.stroke();
       ctx.restore();
-      ctx.fillStyle = '#fca5a5';
-      ctx.font = '700 9px ui-monospace, Menlo, monospace';
+      // label
+      ctx.fillStyle = '#b45309';
+      ctx.font = '800 10px ui-monospace, Menlo, monospace';
       ctx.textAlign = 'center';
-      ctx.fillText('RED CARD', cx, cy + o.h * 0.6 + 6);
+      ctx.fillText('RUG PULL', cx, cy + o.h * 0.6 + 8);
     }
   }
 }
@@ -1288,55 +1295,62 @@ function drawFlags() {
     const spot = solidGroundAfter(cp.x);
     const fx = sx(spot.x), fy = sy(spot.y);
     const reached = player.checkpointIdx >= CHECKPOINTS.indexOf(cp);
+    const col = reached ? '#4ade80' : '#fbbf24';
     ctx.save();
-    ctx.strokeStyle = '#cbd5e1';
-    ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(fx, fy); ctx.lineTo(fx, fy - 88); ctx.stroke();
-    ctx.fillStyle = reached ? '#4ade80' : '#ffd166';
+    // pole
+    ctx.strokeStyle = 'rgba(148,163,184,0.5)';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(fx, fy); ctx.lineTo(fx, fy - 92); ctx.stroke();
+    // glowing price pill
+    ctx.font = '700 12px ui-monospace, Menlo, monospace';
+    const tw = ctx.measureText(cp.label).width + 18;
+    ctx.shadowColor = col; ctx.shadowBlur = 12;
+    ctx.fillStyle = col;
     ctx.beginPath();
-    ctx.moveTo(fx, fy - 88); ctx.lineTo(fx + 46, fy - 76); ctx.lineTo(fx, fy - 64);
-    ctx.closePath(); ctx.fill();
+    if (ctx.roundRect) ctx.roundRect(fx, fy - 106, tw, 22, 6);
+    else ctx.rect(fx, fy - 106, tw, 22);
+    ctx.fill();
+    ctx.shadowBlur = 0;
     ctx.fillStyle = '#04140a';
-    ctx.font = '700 10px ui-monospace, Menlo, monospace';
-    ctx.textAlign = 'left';
-    ctx.fillText(cp.label, fx + 4, fy - 73);
+    ctx.textAlign = 'center';
+    ctx.fillText(cp.label, fx + tw / 2, fy - 90);
     ctx.restore();
   }
 
-  // start marker: "kick off ->"
+  // start marker: "we are here ->"
   if (cam.x < 600) {
     ctx.save();
-    ctx.fillStyle = '#e8eef2';
-    ctx.font = '700 16px ui-monospace, Menlo, monospace';
+    ctx.fillStyle = '#0f172a';
+    ctx.font = '800 20px ui-monospace, Menlo, monospace';
     ctx.textAlign = 'right';
-    ctx.fillText('kick off \u2192', sx(-40), sy(0) + 36);
+    ctx.fillText('we are here \u2192', sx(-40), sy(0) + 36);
     ctx.restore();
   }
 
-  // finish: the World Cup trophy
+  // finish: the $1B trophy
   if (cam.x + W > X_WIN - 900) {
     const spot = solidGroundAfter(X_WIN);
     ctx.save();
     drawTrophy(sx(X_WIN + 70), sy(spot.y + 250), 130);
-    ctx.fillStyle = '#ffd166';
-    ctx.font = '800 26px ui-monospace, Menlo, monospace';
+    ctx.fillStyle = '#0f172a';
+    ctx.font = '800 28px ui-monospace, Menlo, monospace';
     ctx.textAlign = 'right';
-    ctx.fillText('THE FINAL \u2192', sx(X_WIN - 30), sy(spot.y + 150));
+    ctx.fillText('1b \u2192', sx(X_WIN - 30), sy(spot.y + 150));
     // checkered finish line
     const fx = sx(X_WIN);
     const top = sy(spot.y + 300), bot = sy(spot.y) + 10;
     const cell = 14;
     for (let yy = top, row = 0; yy < bot; yy += cell, row++) {
-      ctx.fillStyle = row % 2 ? '#0b0f14' : '#ffffff';
+      ctx.fillStyle = row % 2 ? '#0f172a' : '#cbd5e1';
       ctx.fillRect(fx - 5, yy, 5, cell);
-      ctx.fillStyle = row % 2 ? '#ffffff' : '#0b0f14';
+      ctx.fillStyle = row % 2 ? '#cbd5e1' : '#0f172a';
       ctx.fillRect(fx, yy, 5, cell);
     }
     ctx.restore();
   }
 }
 
-// Glowing World Cup trophy. (cx, cy) = base center on screen, h = height.
+// Glowing $1B prize trophy. (cx, cy) = base center on screen, h = height.
 function drawTrophy(cx, cy, h) {
   const w = h * 0.5;
   ctx.save();
@@ -1398,7 +1412,6 @@ function drawGhosts() {
       drawGhostIndicator(g);
       continue;
     }
-    const gn = NATION_BY_CODE[g.country];
     // While spectating, the watched runner is shown solid + highlighted;
     // everyone else stays as a translucent ghost.
     const watched = isSpectator && gid === spectateId;
@@ -1406,7 +1419,6 @@ function drawGhosts() {
     drawRunner(ctx, sx(g.dx), sy(g.dy), g.dx * 0.045, {
       color: g.color, alpha: watched ? 1 : 0.6, dead: g.dead,
       airborne: false, name: g.name,
-      kit: kitFor(g.country), flag: gn ? gn.flag : '',
     });
   }
 }
@@ -1453,7 +1465,6 @@ function render() {
       color: '#ffffff',
       dead: player.state === 'dead',
       airborne: !player.grounded && player.state === 'run',
-      kit: kitFor(myCountry),
     });
   }
   drawParticles();
@@ -1507,18 +1518,28 @@ const net = (() => {
     document.getElementById('online-dot').classList.toggle('live', online);
   }
 
-  // Backend WebSocket relay (hosted on Render). The frontend is static on
-  // Vercel, which can't run a persistent WS server, so we point at Render.
-  const BACKEND_WS = 'wss://speedrun-99da.onrender.com';
+  // Production frontend is on Vercel; the WS relay runs on Render. Local
+  // dev (`npm start`) uses the same host so multiplayer works immediately.
+  const RENDER_WS = 'wss://speedrun-99da.onrender.com';
+
+  function wsBackendUrl() {
+    const h = location.hostname;
+    if (h === 'localhost' || h === '127.0.0.1' || h === '[::1]') {
+      const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+      return proto + '//' + location.host;
+    }
+    return RENDER_WS;
+  }
 
   function connect() {
     if (!playerName && !asSpectator) return;
-    try { ws = new WebSocket(BACKEND_WS); } catch (e) { scheduleRetry(); return; }
+    const url = wsBackendUrl();
+    try { ws = new WebSocket(url); } catch (e) { scheduleRetry(); return; }
 
     ws.onopen = () => {
       retry = 1000;
       if (asSpectator) ws.send(JSON.stringify({ t: 'spectate' }));
-      else ws.send(JSON.stringify({ t: 'join', name: playerName, country: myCountry }));
+      else ws.send(JSON.stringify({ t: 'join', name: playerName, country: '' }));
     };
     ws.onmessage = (e) => {
       let msg; try { msg = JSON.parse(e.data); } catch { return; }
@@ -1543,22 +1564,12 @@ const net = (() => {
       joined = true;
       myId = msg.id;
       setStatus(true);
-      if (asSpectator) {
-        chat.setNick('spectating');
-        chat.system('spectating — pick a runner with ← / →');
-      } else {
-        chat.setNick(playerName);
-        chat.system('connected — chatting as ' + playerName);
-      }
       ghosts.clear();
       for (const p of msg.players) addGhost(p);
       if (asSpectator) spectateEnsureTarget();
-    } else if (msg.t === 'chat') {
-      chat.receive(msg);
     } else if (msg.t === 'join') {
       addGhost(msg);
-      const jn = NATION_BY_CODE[msg.country];
-      toast((jn ? jn.flag + ' ' : '') + msg.name + ' joined the tournament', 'good');
+      toast(msg.name + ' joined the charge', 'good');
       if (asSpectator) spectateEnsureTarget();
     } else if (msg.t === 'leave') {
       ghosts.delete(msg.id);
@@ -1570,8 +1581,8 @@ const net = (() => {
       g.dead = msg.dead; g.won = msg.won;
       if (g.dx === undefined) { g.dx = g.x; g.dy = g.y; }
     } else if (msg.t === 'event') {
-      if (msg.kind === 'death') toast(msg.name + ' was stopped in the ' + msg.label, 'bad');
-      else if (msg.kind === 'win') toast(msg.name + ' lifted the Trophy in ' + msg.label + '!', 'good');
+      if (msg.kind === 'death') toast(msg.name + ' got rekt at ' + msg.label, 'bad');
+      else if (msg.kind === 'win') toast(msg.name + ' ran it to $1B in ' + msg.label + '!', 'good');
     }
   }
 
@@ -1602,12 +1613,6 @@ const net = (() => {
     ws.send(JSON.stringify({ t: 'event', kind, label }));
   }
 
-  function sendChat(text) {
-    if (!joined || !ws || ws.readyState !== WebSocket.OPEN) return false;
-    ws.send(JSON.stringify({ t: 'chat', text }));
-    return true;
-  }
-
   // Connect as an invisible watcher: same socket/handlers, but sends
   // {t:'spectate'} instead of {t:'join'} so the server never lists us.
   function spectate() {
@@ -1616,7 +1621,7 @@ const net = (() => {
     connect();
   }
 
-  return { connect, startStateLoop, sendEvent, sendChat, spectate };
+  return { connect, startStateLoop, sendEvent, spectate };
 })();
 
 // ---------- spectate target selection ----------
@@ -1643,82 +1648,6 @@ function spectateCycle(dir) {
   spectateId = list[i];
   updateSpectateBar();
 }
-
-// ---------- live chat ----------
-// Docked in the bottom-left corner so it never overlaps the run.
-// Toggle button enables/disables it; the preference is remembered.
-const chat = (() => {
-  const el = document.getElementById('chat');
-  const messagesEl = document.getElementById('chat-messages');
-  const inputEl = document.getElementById('chat-input');
-  const formEl = document.getElementById('chat-form');
-  const toggleEl = document.getElementById('chat-toggle');
-  const nickEl = document.getElementById('chat-nick-name');
-  const dotEl = document.querySelector('#chat-title .dot');
-
-  let enabled = localStorage.getItem('speedrun-chat') !== 'off';
-
-  function applyEnabled() {
-    el.classList.toggle('disabled', !enabled);
-    toggleEl.textContent = enabled ? 'disable' : 'enable';
-    dotEl.classList.toggle('live', enabled);
-  }
-
-  toggleEl.addEventListener('click', () => {
-    enabled = !enabled;
-    localStorage.setItem('speedrun-chat', enabled ? 'on' : 'off');
-    applyEnabled();
-    if (enabled) inputEl.focus();
-  });
-
-  formEl.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const text = inputEl.value.trim();
-    if (!text) return;
-    if (net.sendChat(text)) inputEl.value = '';
-  });
-
-  // Keep typing local: stop keystrokes from bubbling out to the jump handler.
-  inputEl.addEventListener('keydown', (e) => {
-    e.stopPropagation();
-    if (e.key === 'Escape') inputEl.blur();
-  });
-
-  function addLine(node) {
-    const atBottom = messagesEl.scrollHeight - messagesEl.scrollTop - messagesEl.clientHeight < 30;
-    messagesEl.appendChild(node);
-    while (messagesEl.children.length > 80) messagesEl.removeChild(messagesEl.firstChild);
-    if (atBottom) messagesEl.scrollTop = messagesEl.scrollHeight;
-  }
-
-  function system(text) {
-    const div = document.createElement('div');
-    div.className = 'chat-sys';
-    div.textContent = text;
-    addLine(div);
-  }
-
-  function receive(msg) {
-    const div = document.createElement('div');
-    div.className = 'chat-msg' + (msg.id === myId ? ' me' : '');
-    const who = document.createElement('span');
-    who.className = 'who';
-    who.style.color = msg.color || '#e8eef2';
-    who.textContent = msg.name;
-    const sep = document.createTextNode(': ');
-    const txt = document.createElement('span');
-    txt.className = 'txt';
-    txt.textContent = msg.text;
-    div.append(who, sep, txt);
-    addLine(div);
-  }
-
-  function setNick(nick) { nickEl.textContent = nick; }
-  function show() { el.classList.add('visible'); applyEnabled(); }
-
-  applyEnabled();
-  return { receive, system, setNick, show };
-})();
 
 function updateGhosts(dt) {
   const k = Math.min(1, dt * 10);
@@ -1751,7 +1680,7 @@ function toast(text, cls) {
 let lbTimer = 0;
 function updateHUD(dt) {
   if (isSpectator) { updateSpectateHUD(dt); return; }
-  elMcap.textContent = stageAt(player.x);
+  elMcap.textContent = fmtMarketCap(player.x);
   elTimer.textContent = fmtTime(player.runTime);
   const nextCpIdx = player.checkpointIdx + 1;
   if (nextCpIdx < CHECKPOINTS.length) {
@@ -1759,7 +1688,7 @@ function updateHUD(dt) {
     elCpLabel.textContent = left + 'm to ' + CHECKPOINTS[nextCpIdx].label;
   } else {
     const left = Math.max(0, Math.round((X_WIN - player.x) * METERS_PER_UNIT));
-    elCpLabel.textContent = left > 0 ? left + 'm to the TROPHY' : 'lift the trophy!';
+    elCpLabel.textContent = left > 0 ? left + 'm to $1B' : 'top of the market!';
   }
   if (player.runTime > 8 && elHint.style.opacity !== '0') elHint.style.opacity = '0';
 
@@ -1767,11 +1696,9 @@ function updateHUD(dt) {
   if (lbTimer > 0) return;
   lbTimer = 0.25;
 
-  const myNation = NATION_BY_CODE[myCountry];
-  const entries = [{ name: playerName + ' (you)', flag: myNation ? myNation.flag : '', prog: player.x, color: '#ffffff', me: true, won: player.state === 'won' }];
+  const entries = [{ name: playerName + ' (you)', prog: player.x, color: '#ffffff', me: true, won: player.state === 'won' }];
   for (const g of ghosts.values()) {
-    const gn = NATION_BY_CODE[g.country];
-    entries.push({ name: g.name, flag: gn ? gn.flag : '', prog: g.prog, color: g.color, me: false, won: g.won });
+    entries.push({ name: g.name, prog: g.prog, color: g.color, me: false, won: g.won });
   }
   entries.sort((a, b) => b.prog - a.prog);
 
@@ -1783,7 +1710,7 @@ function updateHUD(dt) {
     const e = entries[i];
     const pct = Math.min(100, Math.round((e.prog / X_WIN) * 100));
     html += '<div class="lb-row' + (e.me ? ' me' : '') + '">'
-      + '<span class="lb-name" style="color:' + e.color + '">' + (i + 1) + '. ' + (e.flag ? e.flag + ' ' : '') + escapeHtml(e.name) + (e.won ? ' [CHAMP]' : '') + '</span>'
+      + '<span class="lb-name" style="color:' + e.color + '">' + (i + 1) + '. ' + escapeHtml(e.name) + (e.won ? ' [CHAMP]' : '') + '</span>'
       + '<span class="lb-mcap">' + pct + '%</span></div>';
   }
   elLeaderboard.innerHTML = html;
@@ -1801,8 +1728,7 @@ function updateSpectateHUD(dt) {
 
   const entries = [];
   for (const [gid, g] of ghosts) {
-    const gn = NATION_BY_CODE[g.country];
-    entries.push({ id: gid, name: g.name, flag: gn ? gn.flag : '', prog: g.prog, color: g.color, won: g.won });
+    entries.push({ id: gid, name: g.name, prog: g.prog, color: g.color, won: g.won });
   }
   entries.sort((a, b) => b.prog - a.prog);
 
@@ -1811,7 +1737,7 @@ function updateSpectateHUD(dt) {
     const e = entries[i];
     const pct = Math.min(100, Math.round((e.prog / X_WIN) * 100));
     html += '<div class="lb-row' + (e.id === spectateId ? ' me' : '') + '">'
-      + '<span class="lb-name" style="color:' + e.color + '">' + (i + 1) + '. ' + (e.flag ? e.flag + ' ' : '') + escapeHtml(e.name) + (e.won ? ' [CHAMP]' : '') + '</span>'
+      + '<span class="lb-name" style="color:' + e.color + '">' + (i + 1) + '. ' + escapeHtml(e.name) + (e.won ? ' [CHAMP]' : '') + '</span>'
       + '<span class="lb-mcap">' + pct + '%</span></div>';
   }
   elLeaderboard.innerHTML = html || '<div class="lb-row"><span class="lb-name">no runners yet</span></div>';
@@ -1828,9 +1754,8 @@ function updateSpectateBar() {
     metaEl.textContent = '';
     return;
   }
-  const gn = NATION_BY_CODE[g.country];
   const pct = Math.min(100, Math.round((g.prog / X_WIN) * 100));
-  nameEl.innerHTML = (gn ? gn.flag + ' ' : '') + escapeHtml(g.name) + (g.won ? ' [CHAMP]' : g.dead ? ' (down)' : '');
+  nameEl.textContent = g.name + (g.won ? ' [CHAMP]' : g.dead ? ' (down)' : '');
   metaEl.textContent = stageAt(g.prog) + ' · ' + pct + '%';
 }
 
@@ -1840,33 +1765,12 @@ function escapeHtml(s) {
 
 // ---------- input ----------
 let playerName = '';
-let myCountry = '';
 let walletAddress = '';
 
 // Basic Solana public-key sanity check: base58, 32–44 chars (no 0 O I l).
 function isValidSolanaAddress(addr) {
   return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(addr);
 }
-
-// ---------- country picker ----------
-(function buildCountryPicker() {
-  const grid = document.getElementById('country-grid');
-  if (!grid) return;
-  myCountry = localStorage.getItem('wc-country') || '';
-  function select(code) {
-    myCountry = code;
-    localStorage.setItem('wc-country', code);
-    for (const tile of grid.children) tile.classList.toggle('selected', tile.dataset.code === code);
-  }
-  for (const n of NATIONS) {
-    const tile = document.createElement('div');
-    tile.className = 'country-tile' + (n.code === myCountry ? ' selected' : '');
-    tile.dataset.code = n.code;
-    tile.innerHTML = '<div class="flag">' + n.flag + '</div><div class="cname">' + n.name + '</div>';
-    tile.addEventListener('click', () => select(n.code));
-    grid.appendChild(tile);
-  }
-})();
 
 window.addEventListener('keydown', (e) => {
   if (isSpectator && (e.code === 'ArrowLeft' || e.code === 'ArrowRight')) {
@@ -1892,22 +1796,12 @@ document.getElementById('restart-btn').addEventListener('click', () => {
   startRun();
 });
 
+function walletDisplayName(addr) {
+  if (addr.length <= 10) return addr;
+  return addr.slice(0, 4) + '…' + addr.slice(-4);
+}
+
 function beginGame() {
-  const input = document.getElementById('name-input');
-  playerName = input.value.trim().slice(0, 16);
-  if (!playerName) {
-    input.focus();
-    return;
-  }
-  if (!myCountry) {
-    const label = document.getElementById('country-label');
-    if (label) {
-      label.textContent = 'PICK YOUR NATION FIRST';
-      label.style.color = '#fda4af';
-    }
-    document.getElementById('country-grid').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    return;
-  }
   const walletEl = document.getElementById('wallet-input');
   const walletLabel = document.getElementById('wallet-label');
   walletAddress = walletEl.value.trim();
@@ -1922,18 +1816,16 @@ function beginGame() {
     }
     return;
   }
+  playerName = walletDisplayName(walletAddress);
   localStorage.setItem('wc-wallet', walletAddress);
   localStorage.setItem('speedrun-name', playerName);
   document.getElementById('title-screen').classList.remove('visible');
   document.getElementById('hud').classList.add('visible');
-  chat.setNick(playerName);
-  chat.show();
   sfx.unlock();
   startRun();
   net.connect();
   net.startStateLoop();
 }
-document.getElementById('name-input').value = localStorage.getItem('speedrun-name') || '';
 document.getElementById('wallet-input').value = localStorage.getItem('wc-wallet') || '';
 document.getElementById('wallet-input').addEventListener('input', (e) => {
   e.target.classList.remove('invalid');
@@ -2024,7 +1916,6 @@ if (isSpectator) {
   document.getElementById('spec-prev').addEventListener('click', () => spectateCycle(-1));
   document.getElementById('spec-next').addEventListener('click', () => spectateCycle(1));
   updateSpectateBar();
-  chat.show(); // read-only: compose form is hidden via CSS
   net.spectate();
 }
 

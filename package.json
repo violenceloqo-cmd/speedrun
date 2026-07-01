@@ -1,7 +1,7 @@
 {
-  "name": "world-cup-run",
+  "name": "bullrun",
   "version": "2.0.0",
-  "description": "World Cup Run - multiplayer footballer stickman runner: pick a nation and race to lift the Trophy",
+  "description": "BULLRUN - multiplayer charging-bull runner: rep your country and charge the chart to a $100B market cap",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
